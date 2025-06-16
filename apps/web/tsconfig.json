@@ -1,6 +1,7 @@
 {
   "extends": "@repo/typescript-config/nextjs.json",
   "compilerOptions": {
+    "types": ["next-auth"],
     "plugins": [
       {
         "name": "next"
@@ -10,11 +11,9 @@
   "include": [
     "**/*.ts",
     "**/*.tsx",
+    "types",              // ✅ Add this
     "next-env.d.ts",
-    "next.config.js",
     ".next/types/**/*.ts"
   ],
-  "exclude": [
-    "node_modules"
-  ]
+  "exclude": ["node_modules"]
 }
