@@ -4,13 +4,13 @@ import { redisConnection } from "./redis";
 export const trylockseat=async(seatId:string)=>{
     const lockKey=`lock:seat:${seatId}`;
     try {
-        const result = await redisConnection.set(lockKey,"locked","PX",420000,"NX")
+        const result = await redisConnection.set(lockKey,"locked","PX",420000,"NX")// for 7 mins
         if(result==="OK"){
             console.log("successfully added the seat to lock in redis",result);
             console.log(" lockkey",lockKey);
             return true;
         }
-
+        return false
     } catch (error) {
        console.log(`something went wrong while locking the seat${seatId}`,error);
        return false 
@@ -46,3 +46,25 @@ export const isSeatLocked = async (seatId: string): Promise<boolean> => {
         return false;
     }
 };
+export const withSeatLock=async<T>(seatId:string,callback:()=>Promise<T>)=>{
+    let lockAcquired= false ;
+    try {
+        lockAcquired=await trylockseat(seatId);
+        if(!lockAcquired){
+            console.log(`skkiping callback execuiton as couldnot lock the seat ${seatId}`);
+            return null;
+        }
+        console.log(`lock aquired for the seat${seatId} execution callbacke`);
+        const reslut=await callback()
+        console.log(`callback excuted succesfully now fro seat ${seatId}`);
+        return reslut;
+    } catch (error) {
+        console.log(`error ocured while locking in withseatlock error:${error}`);
+        throw error
+    }finally{
+         if (lockAcquired) {
+            await releaseSeatLock(seatId);
+            console.log(` Lock for seat ${seatId} released `);
+        }
+    } 
+}
