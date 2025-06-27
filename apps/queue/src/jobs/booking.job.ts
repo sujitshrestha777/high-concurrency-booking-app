@@ -53,11 +53,7 @@ export const processBooking = async (job: Job<BookingRequest>) => {
   console.log(`[Worker ${jobId}] Booking job for ${seatId} finished. Result:`, bookingAttemptResult);
 };
 
-// Placeholder functions - You NEED to replace these with your actual database and real-time update logic
-async function getSeatStatusFromDB(seatId: string): Promise<'AVAILABLE' | 'HELD' | 'BOOKED' | 'UNAVAILABLE'> {
-  await new Promise(res => setTimeout(res, 50)); // Simulate async DB call
-  return 'AVAILABLE'; // Default placeholder return
-}
+
 
 async function updateSeatStatusInDB(seatId: string, status: 'AVAILABLE' | 'BOOKED' | 'HELD' | 'UNAVAILABLE', userId: string | null): Promise<void> {
   await new Promise(res => setTimeout(res, 50)); // Simulate async DB call

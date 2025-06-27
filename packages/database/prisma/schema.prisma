@@ -47,6 +47,7 @@ model User {
   createdAt     DateTime  @default(now())
   accounts      Account[]
   sessions      Session[]
+  bookings      Booking[]
 }
 
 model VerificationToken {
@@ -57,7 +58,44 @@ model VerificationToken {
   @@unique([identifier, token])
 }
 
+model Booking {
+  id            String        @id @default(cuid())
+  userId        String
+  user          User          @relation(fields: [userId], references: [id])
+  seatId        String
+  seat          Seat          @relation(fields: [seatId], references: [id])
+  status        BookingStatus @default(PENDING)
+  transactionID String?
+  price         Decimal       @default("0.00") @db.Decimal(10, 2)
+}
+
+model Seat {
+  id              String     @id @default(cuid())
+  seatIdentifier  String     @unique
+  classType       ClassTypes @default(ECONOMY)
+  status          SeatStatus @default(AVAILABLE)
+  currentHolderId String?
+  bookings        Booking[]
+}
+
 enum Role {
   USER
   ADMIN
+}
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  CANCELED
+}
+
+enum SeatStatus {
+  AVAILABLE
+  HELD
+  BOOKED
+}
+
+enum ClassTypes {
+  ECONOMY
+  BUSINESS
 }

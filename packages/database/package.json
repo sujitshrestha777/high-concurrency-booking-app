@@ -10,15 +10,17 @@
     "keywords": [],
     "author": "",
     "license": "ISC",
-   "type": "module",
+    "type": "module",
     "description": "",
     "devDependencies": {
-        "prisma": "^6.7.0"
+        "@types/node": "^24.0.4",
+        "prisma": "^6.10.1",
+        "tsx": "^4.20.3"
     },
     "exports": {
         ".": "./src/index.ts"
     },
     "dependencies": {
-        "@prisma/client": "6.7.0"
+        "@prisma/client": "^6.10.1"
     }
 }

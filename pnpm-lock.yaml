@@ -61,6 +61,9 @@ importers:
 
   apps/queue:
     dependencies:
+      '@repo/db':
+        specifier: workspace:*
+        version: link:../../packages/database
       bullmq:
         specifier: ^5.53.2
         version: 5.53.2
