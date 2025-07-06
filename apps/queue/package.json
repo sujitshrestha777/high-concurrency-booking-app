@@ -13,11 +13,12 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@types/node": "^24.0.8",
     "nodemon": "^3.1.10",
     "typescript": "^5.8.3"
   },
   "dependencies": {
-    "@repo/db":"workspace:*",
+    "@repo/db": "workspace:*",
     "bullmq": "^5.53.2",
     "ioredis": "^5.6.1"
   }

@@ -1,5 +1,6 @@
 import { Job } from "bullmq";
 import { isSeatLocked, withSeatLock } from "../utils/redis.lock";
+import { getSeatStatusFromDB } from "src/utils/dbOperation";
 
 type BookingRequest = {
   userId: string;
@@ -22,7 +23,6 @@ export const processBooking = async (job: Job<BookingRequest>) => {
     }
  
     const paymentSuccessful = Math.random() > 0.1;
-
     if (!paymentSuccessful) {
       console.warn(`[Worker ${jobId}] Payment failed for Seat ${seatId}.`);
       await updateSeatStatusInDB(seatId, 'AVAILABLE', null);
