@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import PaymentForm from "../../components/PaymentForm";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 
 const page = () => {
   const [clientSecret, setClientSecret] = useState<string | null>(null);
@@ -58,7 +58,7 @@ const page = () => {
       setLoading(false);
     }
   };
-  const handlePaymentSuccess = () => {
+  const handlePaymentSuccess = (paymentIntentId: string) => {
     router.push(
       `/payment/success?booking_id=${bookingId}&payment_intent=${paymentIntentId}`
     );
