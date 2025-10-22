@@ -1,6 +1,7 @@
 import { Job } from "bullmq";
-import { isSeatLocked, withSeatLock } from "../utils/redis.lock";
-import { getSeatStatusFromDB } from "src/utils/dbOperation";
+import { isSeatLocked, withSeatLock } from "../utils/redis.lock.js";
+import { getSeatStatusFromDB } from "../utils/dbOperation.js";
+
 
 type BookingRequest = {
   userId: string;
@@ -17,7 +18,7 @@ export const processBooking = async (job: Job<BookingRequest>) => {
     console.log(`[Worker ${jobId}] Lock acquired for Seat ${seatId}. Proceeding with booking logic.`);
 
     const currentDbStatus = await getSeatStatusFromDB(seatId);
-    if (currentDbStatus === 'BOOKED' || currentDbStatus === 'UNAVAILABLE') {
+    if (currentDbStatus?.status === 'BOOKED' || currentDbStatus?.status === 'HELD') {
       console.warn(`[Worker ${jobId}] Seat ${seatId} already ${currentDbStatus} in DB. Aborting booking within lock.`);
       throw new Error(`Seat ${seatId} is already booked or unavailable in DB.`);
     }
@@ -57,8 +58,11 @@ export const processBooking = async (job: Job<BookingRequest>) => {
 
 async function updateSeatStatusInDB(seatId: string, status: 'AVAILABLE' | 'BOOKED' | 'HELD' | 'UNAVAILABLE', userId: string | null): Promise<void> {
   await new Promise(res => setTimeout(res, 50)); // Simulate async DB call
+  console.log(seatId,status,userId);
+  
 }
 
 async function publishSeatUpdate(seatId: string, status: 'AVAILABLE' | 'HELD' | 'BOOKED' | 'UNAVAILABLE', message: string): Promise<void> {
   await new Promise(res => setTimeout(res, 50)); // Simulate async pub/sub call
+    console.log(seatId,status,message);
 }

@@ -1,5 +1,5 @@
 
-import { redisConnection } from "./redis";
+import { redisConnection } from "./redis.js";
  
 export const trylockseat=async(seatId:string)=>{
     const lockKey=`lock:seat:${seatId}`;
@@ -28,6 +28,7 @@ export const releaseSeatLock=async(seatId:string)=>{
                 console.log(`the locked seat ${seatId} doesnot exist`);  
                 return result 
             }
+            return result
         } catch (error) {
             console.log("error while deleting the lockseat ",error);
             return false;
