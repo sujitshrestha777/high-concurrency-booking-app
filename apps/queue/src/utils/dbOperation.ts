@@ -13,7 +13,7 @@ export async function getBookings() {
 export const getSeatStatusFromDB = async (seatId: string) => {
   const seatStatus = await prisma.seat.findUnique({
     where: {
-      id: seatId,
+      seatIdentifier: seatId,
     },
     select: {
       status: true,
