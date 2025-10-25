@@ -24,11 +24,11 @@ export const releaseSeatLock=async(seatId:string)=>{
                 console.log(` deleted the locked seat ${seatId}`); 
                 return result  
             }
-             if(result===0){
+             else{
                 console.log(`the locked seat ${seatId} doesnot exist`);  
                 return result 
             }
-            return result
+          
         } catch (error) {
             console.log("error while deleting the lockseat ",error);
             return false;
@@ -59,7 +59,7 @@ export const withSeatLock=async<T>(seatId:string,callback:()=>Promise<T>)=>{
         const reslut=await callback()
         console.log(`callback excuted succesfully now fro seat ${seatId}`);
         return reslut;
-    } catch (error) {
+    }catch (error) {
         console.log(`error ocured while locking in withseatlock error:${error}`);
         throw error
     }finally{
