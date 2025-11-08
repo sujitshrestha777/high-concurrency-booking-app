@@ -1,20 +1,4 @@
-// Export everything from Prisma Client
-export * from '@prisma/client';
-
-// Export a custom PrismaClient instance if needed
-import { PrismaClient } from '@prisma/client';
-
-// Create a singleton instance
-const globalForPrisma = globalThis as unknown as {
-  prisma: PrismaClient | undefined;
-};
-
-export const prisma =
-  globalForPrisma.prisma ??
-  new PrismaClient({
-    log: ['query', 'error', 'warn'],
-  });
-
-if (process.env.NODE_ENV !== 'production') {
-  globalForPrisma.prisma = prisma;
-}
+// packages/database/src/index.ts
+// ONLY export types - no instances, no runtime code
+export { PrismaClient } from '@prisma/client';
+export type { Prisma } from '@prisma/client';
