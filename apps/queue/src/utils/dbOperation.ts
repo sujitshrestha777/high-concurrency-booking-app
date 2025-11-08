@@ -1,5 +1,6 @@
 
 import { prisma } from '@repo/db';
+import type { Prisma } from '@repo/db';
 
 
 export async function getBookings() {
@@ -10,7 +11,7 @@ export async function getBookings() {
 export async function updateSeatStatusInDB(seatId: string, status: 'AVAILABLE' | 'BOOKED' | 'HELD', userId: string ): Promise<void> {
   await new Promise(res => setTimeout(res, 50)); 
   console.log(seatId,status,userId);
-  await prisma.$transaction(async(tx)=>{
+  await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
       const seat=await tx.seat.findUnique({
         where:{
           seatIdentifier:seatId
@@ -29,7 +30,7 @@ export async function updateSeatStatusInDB(seatId: string, status: 'AVAILABLE' |
       currentHolderId:userId
       }
     })
-     await tx.booking.create({
+    await tx.booking.create({
         data: {
           seatId: seat.id,
           userId: userId,
