@@ -16,7 +16,7 @@ export function HeroSection() {
       </div>
 
       {/* Grid pattern - fades from left to right */}
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#1f1f1f_1px,transparent_1px),linear-gradient(to_bottom,#1f1f1f_1px,transparent_1px)] bg-[size:40px_40px] opacity-30" />
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,#1f1f1f_1px,transparent_1px),linear-gradient(to_bottom,#1f1f1f_1px,transparent_1px)] bg-[size:50px_50px] opacity-30" />
 
       <div className="container relative z-10 py-20">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
@@ -95,9 +95,8 @@ export function HeroSection() {
           </div>
 
           {/* Right visual element */}
-          <div className="relative hidden lg:block">
+          {/* <div className="relative hidden lg:block">
             <div className="relative">
-              {/* Floating card with glassmorphism */}
               <div className="relative bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-8 shadow-2xl">
                 <div className="absolute -top-3 -right-3 w-24 h-24 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full blur-2xl opacity-60" />
 
@@ -154,7 +153,6 @@ export function HeroSection() {
                 </div>
               </div>
 
-              {/* Floating badges */}
               <div className="absolute -left-6 top-1/4 bg-purple-600/90 backdrop-blur-sm text-white px-4 py-2 rounded-full text-sm font-medium shadow-lg animate-pulse">
                 ✨ Real-time Updates
               </div>
@@ -162,7 +160,7 @@ export function HeroSection() {
                 🚀 Instant Booking
               </div>
             </div>
-          </div>
+          </div> */}
         </div>
       </div>
     </section>
