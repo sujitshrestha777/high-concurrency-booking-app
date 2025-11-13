@@ -1,4 +1,5 @@
 import {Queue} from "bullmq"
+import { getRedis } from "lib/redis/redis";
 
 let bookingQueue:Queue|null=null
 
