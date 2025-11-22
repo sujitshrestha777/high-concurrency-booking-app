@@ -47,7 +47,7 @@ export const isSeatLocked = async (seatId: string): Promise<boolean> => {
         return false;
     }
 };
-export const withSeatLock=async<T>(seatId:string,callback:()=>Promise<T>)=>{
+export const withSeatLock=async<T>(seatId:string,callback:()=>Promise<T>):Promise<T|null>=>{
     let lockAcquired= false ;
     try {
         lockAcquired=await trylockseat(seatId);

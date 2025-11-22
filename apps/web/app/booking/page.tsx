@@ -1,35 +1,63 @@
-// apps/web/app/booking/[flightId]/page.tsx
-import SeatMap from "../../components/Seats";
+"use client";
 
-// Fake/mock data for now — ideally fetch from DB
-const getSeats = async () => {
-  // Mock 4 business + 12 economy seats
-  return [
-    { id: "b1", seatNumber: "1A", type: "BUSINESS", isBooked: false },
-    { id: "b2", seatNumber: "1B", type: "BUSINESS", isBooked: true },
-    { id: "b3", seatNumber: "1C", type: "BUSINESS", isBooked: false },
-    { id: "b4", seatNumber: "1D", type: "BUSINESS", isBooked: false },
+import { SeatMap } from "components/SeatMap";
+import { Summary } from "components/Summary";
+import { SeatData, SeatRow } from "lib/types/types";
+import { generatePlaneLayout } from "lib/util/util";
+import { useState, useEffect } from "react";
 
-    { id: "e1", seatNumber: "4A", type: "ECONOMY", isBooked: false },
-    { id: "e2", seatNumber: "4B", type: "ECONOMY", isBooked: false },
-    { id: "e3", seatNumber: "4C", type: "ECONOMY", isBooked: true },
-    { id: "e4", seatNumber: "4D", type: "ECONOMY", isBooked: false },
-    { id: "e5", seatNumber: "4E", type: "ECONOMY", isBooked: false },
-    { id: "e6", seatNumber: "4F", type: "ECONOMY", isBooked: true },
-    // ...more seats
-  ];
-};
+export default function BookingPage() {
+  const [rows, setRows] = useState<SeatRow[]>([]);
+  const [selectedSeats, setSelectedSeats] = useState<SeatData[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-export default async function BookingPage() {
-  const seats = await getSeats();
-  console.log(seats);
+  useEffect(() => {
+    // Simulate API delay
+    setTimeout(() => {
+      setRows(generatePlaneLayout());
+      setIsLoading(false);
+    }, 500);
+  }, []);
+
+  const handleToggle = (seat: SeatData) => {
+    setSelectedSeats((prev) => {
+      const exists = prev.find((s) => s.id === seat.id);
+      if (exists) {
+        return prev.filter((s) => s.id !== seat.id);
+      }
+      return [...prev, seat];
+    });
+  };
 
   return (
-    <div className="p-6 max-w-4xl mx-auto">
-      <h1 className="text-2xl font-semibold mb-4">
-        Select Your Seat for Flight
-      </h1>
-      <SeatMap />
-    </div>
+    <main className="h-screen bg-black text-white  flex flex-col relative px-2">
+      {/* Background Elements */}
+
+      <div className="absolute inset-0 bg-gradient-to-b from-slate-900 via-black to-black -z-10" />
+      <div className="absolute inset-0 bg-[size:40px_40px] bg-[linear-gradient(to_right,#ffffff05_1px,transparent_1px),linear-gradient(to_bottom,#ffffff05_1px,transparent_1px)] -z-10" />
+
+      {/* Main Content Container */}
+      <div className="flex-1 container mx-auto p-4 flex flex-col lg:flex-row gap-6 overflow-hidden">
+        {isLoading ? (
+          <div className="flex-1 flex items-center justify-center">
+            <div className="text-purple-400 animate-pulse text-xl">
+              Loading Seat Map...
+            </div>
+          </div>
+        ) : (
+          <>
+            {/* Left: The Map */}
+            <SeatMap
+              rows={rows}
+              selectedSeatIds={selectedSeats.map((s) => s.id)}
+              onSeatToggle={handleToggle}
+            />
+
+            {/* Right: The Summary */}
+            <Summary selectedSeats={selectedSeats} />
+          </>
+        )}
+      </div>
+    </main>
   );
 }
