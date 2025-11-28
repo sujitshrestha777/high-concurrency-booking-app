@@ -6,6 +6,7 @@ export function Summary({ selectedSeats }: { selectedSeats: SeatData[] }) {
   return (
     <div className="lg:w-96 w-full flex-shrink-0">
       <div className="bg-gray-900/50 border border-white/10 rounded-2xl p-6 backdrop-blur-xl shadow-2xl sticky top-8">
+        <div className="absolute inset-0 z-0 bg-[linear-gradient(to_right,#1f1f1f_1px,transparent_1px),linear-gradient(to_bottom,#1f1f1f_1px,transparent_1px)] bg-[size:50px_50px] opacity-30 pointer-events-none" />
         <h3 className="text-xl font-bold text-white mb-1">Your Selection</h3>
         <p className="text-sm text-gray-400 mb-6">Review your seats</p>
 
@@ -19,7 +20,7 @@ export function Summary({ selectedSeats }: { selectedSeats: SeatData[] }) {
             selectedSeats.map((seat) => (
               <div
                 key={seat.id}
-                className="flex justify-between items-center bg-white/5 p-3 rounded-lg border border-white/5 animate-in slide-in-from-left-2 fade-in"
+                className="flex justify-between items-center bg-white/5 p-3 rounded-lg border border-white/5 animate-in slide-in-from-left-2 fade-in mr-4"
               >
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-8 rounded-full bg-purple-500/20 flex items-center justify-center text-purple-300 text-xs font-bold">

@@ -12,6 +12,7 @@ export function SeatMap({ rows, selectedSeatIds, onSeatToggle }: SeatMapProps) {
 
   return (
     <div className="flex-1 relative overflow-hidden bg-gray-900/30 border border-white/10 rounded-2xl backdrop-blur-sm flex flex-col">
+      {/* background pattern */}
       <div className="absolute inset-0 z-0 bg-[linear-gradient(to_right,#1f1f1f_1px,transparent_1px),linear-gradient(to_bottom,#1f1f1f_1px,transparent_1px)] bg-[size:50px_50px] opacity-30 pointer-events-none" />
 
       <div className="relative z-10 flex-1 overflow-y-auto [scrollbar-width:none] h-full">
