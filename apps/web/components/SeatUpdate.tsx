@@ -16,7 +16,7 @@ export function SeatUpdate() {
     };
 
     ws.onmessage = (event) => {
-      const message: SeatMessage = JSON.parse(event.data).data;
+      const message: SeatMessage = JSON.parse(event.data);
       console.log("from ws server:", message);
       setData((prev) => [...prev, message]);
     };

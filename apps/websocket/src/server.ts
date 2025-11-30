@@ -44,7 +44,7 @@ redis.on('message', (channel, message) => {
     try {
       const seatUpdate = JSON.parse(message);
       
-     
+     console.log("message from pub in websocket server:",seatUpdate)
       clients.forEach(client => {
         if (client.readyState === WebSocket.OPEN) {
           client.send(JSON.stringify({

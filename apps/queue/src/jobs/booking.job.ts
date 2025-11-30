@@ -23,6 +23,7 @@ export const processBooking = async (job: Job<BookingRequest>) => {
       seatId,
       type:"locked7min"
     }))
+    console.log("the locked7min redis message published!!!")
     const currentDbStatus = await getSeatStatusFromDB(seatId);
     if (currentDbStatus?.status === 'BOOKED' || currentDbStatus?.status === 'HELD') {
       console.warn(`[Worker ${jobId}] Seat ${seatId} already ${currentDbStatus} in DB. Aborting booking within lock.`);
@@ -43,6 +44,7 @@ export const processBooking = async (job: Job<BookingRequest>) => {
       seatId,
       type:"Booked"
     }))
+    console.log(`Redis message booked has been published for SeatID: ${seatId}`)
     await updateSeatStatusInDB(seatId, 'BOOKED', userId);
     console.log(`[Worker ${jobId}] Seat ${seatId} successfully BOOKED in DB for User ${userId}.`);
 
