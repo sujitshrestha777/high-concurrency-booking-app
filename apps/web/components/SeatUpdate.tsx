@@ -1,23 +1,39 @@
 import { useState, useEffect } from "react";
 
+interface SeatMessage {
+  status: string;
+  seatId: string;
+}
+
 export function SeatUpdate() {
-  const [data, setData] = useState(null);
+  const [data, setData] = useState<SeatMessage[]>([]);
 
   useEffect(() => {
-    const eventSource = new EventSource("/api/socket");
+    const ws = new WebSocket("ws://localhost:8080");
 
-    eventSource.onmessage = (event) => {
-      const newData = JSON.parse(event.data);
-      setData(newData);
+    ws.onopen = () => {
+      console.log("Connected to WebSocket server");
     };
 
-    eventSource.onerror = (error) => {
-      console.error("SSE error:", error);
-      eventSource.close();
+    ws.onmessage = (event) => {
+      const message: SeatMessage = JSON.parse(event.data).data;
+      console.log("from ws server:", message);
+      setData((prev) => [...prev, message]);
     };
 
-    return () => eventSource.close();
+    return () => ws.close();
   }, []);
 
-  return <div>{data ? JSON.stringify(data) : "Loading..."}</div>;
+  return (
+    <div>
+      <h1>Messages</h1>
+      <ul>
+        {data.map((item, index) => (
+          <li key={index}>
+            Type: {item?.status}, Seat: {item?.seatId}
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
 }
