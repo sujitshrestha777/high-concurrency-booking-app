@@ -1,24 +1,23 @@
-"use client";
-import React, { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 
-export const SeatUpdate = () => {
-  const [messages, setMessages] = useState<string[]>([]);
+export function SeatUpdate() {
+  const [data, setData] = useState(null);
+
   useEffect(() => {
-    fetch("/api/sockets");
-    const ws = new WebSocket(`ws://${window.location.host}/api/socket`);
+    const eventSource = new EventSource("/api/socket");
 
-    ws.onmessage = (e) => {
-      setMessages((prev) => [...prev, e.data]);
+    eventSource.onmessage = (event) => {
+      const newData = JSON.parse(event.data);
+      setData(newData);
     };
-    return () => {
-      ws.close();
+
+    eventSource.onerror = (error) => {
+      console.error("SSE error:", error);
+      eventSource.close();
     };
+
+    return () => eventSource.close();
   }, []);
-  return (
-    <>
-      {messages.map((message, i) => (
-        <div key={i}>message</div>
-      ))}
-    </>
-  );
-};
+
+  return <div>{data ? JSON.stringify(data) : "Loading..."}</div>;
+}

@@ -1,6 +1,8 @@
 import { Job } from "bullmq";
 import { isSeatLocked, withSeatLock } from "../utils/redis.lock.js";
 import { getSeatStatusFromDB, publishSeatUpdate, updateSeatStatusInDB } from "../utils/dbOperation.js";
+import { redisConnection } from "../utils/redis.js";
+
 
 
 type BookingRequest = {
@@ -17,6 +19,10 @@ export const processBooking = async (job: Job<BookingRequest>) => {
   const bookingAttemptResult = await withSeatLock(seatId, async () => {
     console.log(`[Worker ${jobId}] Lock acquired for Seat ${seatId}. Proceeding with booking logic.`);
 
+    await redisConnection.publish("SeatUpdateRealtime",JSON.stringify({
+      seatId,
+      type:"locked7min"
+    }))
     const currentDbStatus = await getSeatStatusFromDB(seatId);
     if (currentDbStatus?.status === 'BOOKED' || currentDbStatus?.status === 'HELD') {
       console.warn(`[Worker ${jobId}] Seat ${seatId} already ${currentDbStatus} in DB. Aborting booking within lock.`);
@@ -33,6 +39,10 @@ export const processBooking = async (job: Job<BookingRequest>) => {
       throw new Error(`Payment processing failed for seat ${seatId}.`);
     }
 
+    await redisConnection.publish("SeatUpdateRealtime",JSON.stringify({
+      seatId,
+      type:"Booked"
+    }))
     await updateSeatStatusInDB(seatId, 'BOOKED', userId);
     console.log(`[Worker ${jobId}] Seat ${seatId} successfully BOOKED in DB for User ${userId}.`);
 

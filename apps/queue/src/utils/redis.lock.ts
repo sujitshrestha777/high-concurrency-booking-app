@@ -56,6 +56,7 @@ export const withSeatLock=async<T>(seatId:string,callback:()=>Promise<T>):Promis
             return null;
         }
         console.log(`lock aquired for the seat${seatId} execution callbacke`);
+        
         const reslut=await callback()
         console.log(`callback excuted succesfully now fro seat ${seatId}`);
         return reslut;
