@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Seat } from "./Seats";
+import { Seat } from "./Seat";
 
 interface SeatMapProps {
   rows: SeatRow[];
