@@ -21,7 +21,7 @@ export const processBooking = async (job: Job<BookingRequest>) => {
 
     await redisConnection.publish("SeatUpdateRealtime",JSON.stringify({
       seatId,
-      type:"locked7min"
+      type:"Locked"
     }))
     console.log("the locked7min redis message published!!!")
     const currentDbStatus = await getSeatStatusFromDB(seatId);

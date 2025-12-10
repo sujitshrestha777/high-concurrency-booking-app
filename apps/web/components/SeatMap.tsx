@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Seat } from "./Seat";
+import { SeatData, SeatRow } from "lib/types/types";
 
 interface SeatMapProps {
   rows: SeatRow[];
@@ -10,7 +11,7 @@ interface SeatMapProps {
 export function SeatMap({ rows, selectedSeatIds, onSeatToggle }: SeatMapProps) {
   const [seatStatuses, setSeatStatuses] = useState<{
     [seatId: string]: string;
-  }>({});
+  }>({ "24D": "locked", "1A": "booked" });
   let economyHeaderDisplayed = true;
 
   useEffect(() => {

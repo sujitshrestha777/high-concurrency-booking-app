@@ -92,11 +92,7 @@ export function Seat({ seat, isSelected, onToggle, wsStatus }: SeatProps) {
           className="absolute -top-1 -right-1 w-2 h-2 rounded-full animate-pulse"
           style={{
             backgroundColor:
-              wsStatus.toLowerCase() === "booked"
-                ? "#ef4444"
-                : wsStatus.toLowerCase() === "locked"
-                  ? "#eab308"
-                  : "#6b7280",
+              wsStatus.toLowerCase() === "locked" ? "#eab308" : "",
           }}
         />
       )}
