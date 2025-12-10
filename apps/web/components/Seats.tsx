@@ -1,23 +1,53 @@
-import { SeatData } from "../lib/types/types";
+import { useState, useEffect } from "react";
 
+// Types
+interface SeatData {
+  id: string;
+  status: string;
+  type: string;
+  position: string;
+}
+
+interface SeatRow {
+  rowNumber: number;
+  leftSeats: SeatData[];
+  rightSeats: SeatData[];
+}
+
+interface WSMessage {
+  type: string;
+  data: {
+    seatId: string;
+    type: string;
+  };
+  timestamp: number;
+}
+
+// Seat Component
 interface SeatProps {
   seat: SeatData;
   isSelected: boolean;
   onToggle: (seat: SeatData) => void;
+  wsStatus?: string; // WebSocket status
 }
 
-export function Seat({ seat, isSelected, onToggle }: SeatProps) {
-  const isBooked = seat.status === "booked";
+export function Seat({ seat, isSelected, onToggle, wsStatus }: SeatProps) {
+  const isBooked =
+    seat.status === "booked" || wsStatus?.toLowerCase() === "booked";
+  const isLocked = wsStatus?.toLowerCase() === "locked";
 
-  // Base styling
   const baseClasses =
     "group relative flex flex-col items-center justify-center p-1 sm:p-2 rounded-md transition-all duration-200 border";
 
-  // Conditional styling (Neon vs Booked)
   let stateClasses = "";
+
+  // WebSocket statuses take priority
   if (isBooked) {
     stateClasses =
-      " bg-gray-800/50  opacity-40  cursor-not-allowed border-transparent  text-gray-500";
+      "bg-red-500/30 border-red-500 opacity-70 cursor-not-allowed text-red-200";
+  } else if (isLocked) {
+    stateClasses =
+      "bg-yellow-500/30 border-yellow-500 opacity-70 cursor-not-allowed text-yellow-200";
   } else if (isSelected) {
     stateClasses =
       "bg-gradient-to-br from-purple-600 to-pink-600 border-purple-400 text-white shadow-[0_0_15px_rgba(168,85,247,0.5)] scale-110 z-10";
@@ -26,18 +56,19 @@ export function Seat({ seat, isSelected, onToggle }: SeatProps) {
       "bg-white/5 border-transparent hover:border-purple-500/30 hover:bg-white/10 text-gray-500 hover:text-purple-300 cursor-pointer";
   }
 
-  // Size logic
   const sizeClass =
     seat.type === "business"
       ? "w-8 h-8 sm:w-10 sm:h-10"
       : "w-6 h-6 sm:w-8 sm:h-8";
 
+  const isClickable = !isBooked && !isLocked;
+
   return (
     <button
-      onClick={() => !isBooked && onToggle(seat)}
-      disabled={isBooked}
+      onClick={() => isClickable && onToggle(seat)}
+      disabled={!isClickable}
       className={`${baseClasses} ${stateClasses}`}
-      aria-label={`Seat ${seat.id} ${seat.status}`}
+      aria-label={`Seat ${seat.id} ${wsStatus || seat.status}`}
     >
       <svg
         viewBox="0 0 24 24"
@@ -54,6 +85,21 @@ export function Seat({ seat, isSelected, onToggle }: SeatProps) {
       <span className="text-[9px] sm:text-[10px] font-bold tracking-widest">
         {seat.id}
       </span>
+
+      {/* WebSocket status indicator */}
+      {wsStatus && (
+        <div
+          className="absolute -top-1 -right-1 w-2 h-2 rounded-full animate-pulse"
+          style={{
+            backgroundColor:
+              wsStatus.toLowerCase() === "booked"
+                ? "#ef4444"
+                : wsStatus.toLowerCase() === "locked"
+                  ? "#eab308"
+                  : "#6b7280",
+          }}
+        />
+      )}
     </button>
   );
 }

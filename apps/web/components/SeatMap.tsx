@@ -1,4 +1,4 @@
-import { SeatRow, SeatData } from "../lib/types/types";
+import { useEffect, useState } from "react";
 import { Seat } from "./Seats";
 
 interface SeatMapProps {
@@ -8,7 +8,37 @@ interface SeatMapProps {
 }
 
 export function SeatMap({ rows, selectedSeatIds, onSeatToggle }: SeatMapProps) {
+  const [seatStatuses, setSeatStatuses] = useState<{
+    [seatId: string]: string;
+  }>({});
   let economyHeaderDisplayed = true;
+
+  useEffect(() => {
+    const ws = new WebSocket("ws://localhost:8080");
+
+    ws.onopen = () => {
+      console.log("Connected to WebSocket server");
+    };
+
+    ws.onmessage = (event) => {
+      const message: WSMessage = JSON.parse(event.data);
+      console.log("from ws server:", message);
+
+      // Update seat status map
+      if (message.data?.seatId && message.data?.type) {
+        setSeatStatuses((prev) => ({
+          ...prev,
+          [message.data.seatId]: message.data.type,
+        }));
+      }
+    };
+
+    ws.onerror = (error) => {
+      console.error("WebSocket error:", error);
+    };
+
+    return () => ws.close();
+  }, []);
 
   return (
     <div className="flex-1 relative overflow-hidden bg-gray-900/30 border border-white/10 rounded-2xl backdrop-blur-sm flex flex-col">
@@ -32,6 +62,7 @@ export function SeatMap({ rows, selectedSeatIds, onSeatToggle }: SeatMapProps) {
               </span>
             </div>
           </div>
+
           <div className="flex flex-col items-center gap-3 pb-20">
             {rows.map((row) => {
               // Check if we need to show economy header
@@ -72,6 +103,7 @@ export function SeatMap({ rows, selectedSeatIds, onSeatToggle }: SeatMapProps) {
                           seat={seat}
                           isSelected={selectedSeatIds.includes(seat.id)}
                           onToggle={onSeatToggle}
+                          wsStatus={seatStatuses[seat.id]}
                         />
                       ))}
                     </div>
@@ -89,6 +121,7 @@ export function SeatMap({ rows, selectedSeatIds, onSeatToggle }: SeatMapProps) {
                           seat={seat}
                           isSelected={selectedSeatIds.includes(seat.id)}
                           onToggle={onSeatToggle}
+                          wsStatus={seatStatuses[seat.id]}
                         />
                       ))}
                     </div>
