@@ -6,6 +6,7 @@ import { getbookingLimiter } from "lib/ratelimit";
 import { redirect } from "next/navigation";
 import { NextRequest, NextResponse } from "next/server";
 
+let userId="cma6td4xb0003usns9hg3ral2"; // Temporary placeholder for userId
 
 
 export async function POST(req:NextRequest) {
@@ -20,11 +21,11 @@ export async function POST(req:NextRequest) {
         )
     }
     try {
-        const session = await auth();
-        if (!session) {
-                redirect("/auth/sign-in");
-            }
-        const userId=session.user.id
+        // const session = await auth();
+        // if (!session) {
+        //         redirect("/auth/sign-in");
+        //     }
+        // const userId=session.user.id
         const {seatId}=await req.json() 
         
         const queue=getBookingQueue();
@@ -35,7 +36,7 @@ export async function POST(req:NextRequest) {
                 seatId
             },
             {
-                jobId:`booking-${seatId}-${session.user.id}-${Date.now()}`
+                jobId:`booking-${seatId}-${userId}-${Date.now()}`
             }
         )
 

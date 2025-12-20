@@ -11,7 +11,7 @@ interface SeatMapProps {
 export function SeatMap({ rows, selectedSeatIds, onSeatToggle }: SeatMapProps) {
   const [seatStatuses, setSeatStatuses] = useState<{
     [seatId: string]: string;
-  }>({ "24D": "locked", "1A": "booked" });
+  }>({ "24D": "locked" });
   let economyHeaderDisplayed = true;
 
   useEffect(() => {

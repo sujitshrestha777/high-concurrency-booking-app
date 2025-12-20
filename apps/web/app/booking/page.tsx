@@ -13,11 +13,8 @@ export default function BookingPage() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Simulate API delay
-    setTimeout(() => {
-      setRows(generatePlaneLayout());
-      setIsLoading(false);
-    }, 500);
+    setRows(generatePlaneLayout());
+    setIsLoading(false);
   }, []);
 
   const handleToggle = (seat: SeatData) => {

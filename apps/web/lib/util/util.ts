@@ -11,7 +11,7 @@ function createSeat(row: number, col: string, type: "business" | "economy"): Sea
     col,
     type,
     price,
-    status: isBooked ? "booked" : "available",
+    status,
   };
 }
 
