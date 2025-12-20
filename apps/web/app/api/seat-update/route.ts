@@ -1,18 +1,18 @@
 
 import { auth } from "lib/auth/auth";
-import { redirect } from "next/navigation";
 import { prisma } from "lib/db";
 import { NextResponse } from "next/server";
 
 
 export async function GET(req: Request) {
     try {
-        const session = await auth();
-        if (!session) { return NextResponse.json(
-        { error: "Unauthorized" },
-        { status: 401 }
-              );
-        }
+        // const session = await auth();
+        // if (!session) { 
+        //     return NextResponse.json(
+        //             { error: "Unauthorized" },
+        //             { status: 401 }
+        //                 );
+        // }
             const seat_booked_updates = await prisma.seat.findMany({
                 where:{
                     status:"BOOKED"
@@ -34,3 +34,4 @@ export async function GET(req: Request) {
             { status: 500 }
         )
     }
+}

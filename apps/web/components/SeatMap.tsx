@@ -15,6 +15,39 @@ export function SeatMap({ rows, selectedSeatIds, onSeatToggle }: SeatMapProps) {
   let economyHeaderDisplayed = true;
 
   useEffect(() => {
+    async function fetchBookedSeats() {
+      try {
+        const res = await fetch("/api/seat-update");
+
+        if (!res.ok) {
+          console.error("Failed to fetch booked seats");
+          return;
+        }
+
+        const data = await res.json();
+
+        const bookedMap = data.booked_seat.reduce((acc: any, seat: any) => {
+          acc[seat] = "booked";
+          return acc;
+        }, {});
+
+        setSeatStatuses((prev) => ({
+          ...prev,
+          ...bookedMap,
+        }));
+        console.log("seat booked are :", data, bookedMap);
+        // if (seatStatuses["1A"] === "booked") {
+        //   console.log("Seat 1A is already booked!");
+        // }
+      } catch (error) {
+        console.error("Error fetching booked seats:", error);
+      }
+    }
+
+    fetchBookedSeats();
+  }, []);
+
+  useEffect(() => {
     const ws = new WebSocket("ws://localhost:8080");
 
     ws.onopen = () => {
