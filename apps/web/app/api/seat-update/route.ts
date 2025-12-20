@@ -21,9 +21,10 @@ export async function GET(req: Request) {
                     seatIdentifier:true,
                 }
             });
+            const booked_seat=seat_booked_updates.map(seat=>seat.seatIdentifier)
             return NextResponse.json({
                 success:true,
-                seat_booked_updates
+                booked_seat
             });
         
     } catch (error) {
