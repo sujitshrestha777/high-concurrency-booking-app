@@ -47,9 +47,9 @@ export async function POST(req:NextRequest) {
     });        
     } catch (error) {
         console.error('Booking error:', error);
-    return NextResponse.json(
-      { error: 'Failed to queue booking' },
-      { status: 500 }
-    );
+        return NextResponse.json(
+        { error: 'Failed to queue booking' },
+        { status: 500 }
+        );
     }
 }

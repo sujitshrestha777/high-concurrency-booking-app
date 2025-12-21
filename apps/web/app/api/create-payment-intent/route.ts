@@ -1,14 +1,15 @@
+import { ClassTypes } from '@prisma/client';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import {z} from "zod"
 
 const createPaymentSchema = z.object({
-  amount: z.number().min(50), // Minimum $0.50
   currency: z.string().default('usd'),
   bookingId: z.string().min(1),
   customerEmail: z.string().email(),
   metadata: z.record(z.string()).optional(),
+  ClassTypes: z.enum(["first-class","second-class"]),
 });
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
@@ -19,10 +20,14 @@ export async function POST(request:NextRequest) {
    try {
      const data= await  request.json()
      const validatedData = createPaymentSchema.parse(data)
- 
+    const classTypes=validatedData.ClassTypes
+     const prices = {
+      'first-class': 10000, 
+      'second-class': 5000,  
+    };
      const paymentIntent=await stripe.paymentIntents.create({
-        amount: validatedData.amount,
-       currency: validatedData.currency,
+      amount: prices[classTypes as keyof typeof prices],
+       currency:'usd',
        metadata: {
          bookingId: validatedData.bookingId,
          ...validatedData.metadata,
@@ -34,8 +39,7 @@ export async function POST(request:NextRequest) {
      })
  
      return NextResponse.json({
-      clientSecret: paymentIntent.client_secret,
-       paymentIntentId: paymentIntent.id,
+     
      })
    } catch (error) {
     console.log("Error while creating paymentIntent",error)
