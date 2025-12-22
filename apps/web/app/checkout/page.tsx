@@ -31,8 +31,7 @@ const page = () => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          amount: bookingData.price,
-          currency: "usd",
+          classType: "first-class",
           bookingId: bookingData.id,
           customerEmail: bookingData.customerEmail,
           metadata: {
