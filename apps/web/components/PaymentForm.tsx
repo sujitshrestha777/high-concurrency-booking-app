@@ -5,7 +5,7 @@ import {
   PaymentElement,
   Elements,
 } from "@stripe/react-stripe-js";
-import { getStripePromise } from "../lib/stripe/stripeClientSide";
+import { getStripePromise } from "../lib/stripe/stripe";
 
 interface paymentProps {
   clientSecret: string;
