@@ -1,10 +1,10 @@
 
 import { redisConnection } from "./redis.js";
  
-export const trylockseat=async(seatId:string)=>{
-    const lockKey=`lock:seat:${seatId}`;
+export const trylockseat=async(seatId:string,userId:string)=>{
+    const lockKey=`lock:seat:${seatId}:${userId}`;
     try {
-        const result = await redisConnection.set(lockKey,"locked","PX",420000,"NX")// for 7 mins
+        const result = await redisConnection.set(lockKey,"locked","EX",180,"NX")
         if(result==="OK"){
             console.log("successfully added the seat to lock in redis",result);
             console.log(" lockkey",lockKey);
@@ -16,8 +16,8 @@ export const trylockseat=async(seatId:string)=>{
        return false 
     }
 }
-export const releaseSeatLock=async(seatId:string)=>{
-        const lockKey=`lock:seat:${seatId}`;
+export const releaseSeatLock=async(seatId:string,userId:string)=>{
+        const lockKey=`lock:seat:${seatId}:${userId}`;
         try {
             const result=await redisConnection.del(lockKey);
             if(result===1){
@@ -34,8 +34,8 @@ export const releaseSeatLock=async(seatId:string)=>{
             return false;
         }
 }
-export const isSeatLocked = async (seatId: string): Promise<boolean> => {
-    const lockKey = `lock:seat:${seatId}`;
+export const isSeatLocked = async (seatId: string,userId:string): Promise<boolean> => {
+    const lockKey = `lock:seat:${seatId}:${userId}`;
     console.log(`[Lock] Checking if ${lockKey} is locked`);
     try {
         const exists = await redisConnection.exists(lockKey);
@@ -47,10 +47,10 @@ export const isSeatLocked = async (seatId: string): Promise<boolean> => {
         return false;
     }
 };
-export const withSeatLock=async<T>(seatId:string,callback:()=>Promise<T>):Promise<T|null>=>{
+export const withSeatLock=async<T>(seatId:string,userId:string,callback:()=>Promise<T>):Promise<T|null>=>{
     let lockAcquired= false ;
     try {
-        lockAcquired=await trylockseat(seatId);
+        lockAcquired=await trylockseat(seatId,userId);
         if(!lockAcquired){
             console.log(`skkiping callback execuiton as couldnot lock the seat ${seatId}`);
             return null;
@@ -65,7 +65,7 @@ export const withSeatLock=async<T>(seatId:string,callback:()=>Promise<T>):Promis
         throw error
     }finally{
          if (lockAcquired) {
-            await releaseSeatLock(seatId);
+            await releaseSeatLock(seatId,userId);
             console.log(` Lock for seat ${seatId} released `);
         }
     } 

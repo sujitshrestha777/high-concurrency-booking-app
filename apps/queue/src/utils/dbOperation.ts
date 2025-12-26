@@ -9,7 +9,7 @@ export async function getBookings() {
 }
 
 export async function updateSeatStatusInDB(seatId: string, status: 'AVAILABLE' | 'BOOKED' | 'HELD', userId: string ): Promise<void> {
-  await new Promise(res => setTimeout(res, 50)); 
+  // await new Promise(res => setTimeout(res, 50)); 
   console.log(seatId,status,userId);
   await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
       const seat=await tx.seat.findUnique({

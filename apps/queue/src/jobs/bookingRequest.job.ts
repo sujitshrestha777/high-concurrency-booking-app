@@ -16,7 +16,7 @@ export const processBooking = async (job: Job<BookingRequest>) => {
 
   console.log(`[Worker ${jobId}] Received booking job for Seat: ${seatId}, User: ${userId}`);
 
-  const bookingAttemptResult = await withSeatLock(seatId, async () => {
+  const bookingAttemptResult = await withSeatLock(seatId,userId, async () => {
     console.log(`[Worker ${jobId}] Lock acquired for Seat ${seatId}. Proceeding with booking logic.`);
 
     await redisConnection.publish("SeatUpdateRealtime",JSON.stringify({
