@@ -12,8 +12,8 @@ export async function POST(req: Request) {
 
     // Define your prices
     const prices = {
-      'first-class': 10000,  // $100 in cents
-      'second-class': 5000,   // $50 in cents
+      'first-class': 25000,  // $250 in cents
+      'second-class': 10000,   // $100 in cents
     };
 
     // Create checkout session

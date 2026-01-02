@@ -14,8 +14,8 @@ export default function BookingForm() {
   const [error, setError] = useState("");
 
   const prices = {
-    "first-class": 100,
-    "second-class": 50,
+    "first-class": 250,
+    "second-class": 100,
   };
 
   const totalPrice = prices[classType] * quantity;
