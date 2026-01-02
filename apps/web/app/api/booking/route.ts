@@ -42,8 +42,8 @@ export async function POST(req:NextRequest) {
 
          return NextResponse.json({
             success: true,
-            jobId: job.id,
-            message: 'Booking queued',
+            jobId: job.id,  
+            message: 'Booking queued for seat ' + seatId,
     });        
     } catch (error) {
         console.error('Booking error:', error);

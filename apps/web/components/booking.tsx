@@ -1,6 +1,7 @@
 "use client";
 
 import { getStripePromise } from "lib/stripe/stripe";
+import { useSearchParams } from "next/navigation";
 import { useState } from "react";
 
 export default function BookingForm() {
@@ -12,6 +13,10 @@ export default function BookingForm() {
   const [time, setTime] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [seatId, setSeatID] = useState("");
+
+  const searchparams = useSearchParams();
+  const seatid = searchparams.get("id");
 
   const prices = {
     "first-class": 250,
@@ -84,7 +89,7 @@ export default function BookingForm() {
                 className="mr-3"
               />
               <div className="flex-1">
-                <div className="font-medium">First Class</div>
+                <div className="font-medium">First Class {seatid}</div>
                 <div className="text-sm text-gray-600">
                   ${prices["first-class"]} per ticket
                 </div>

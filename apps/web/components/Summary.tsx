@@ -1,7 +1,31 @@
+import { useRouter } from "next/navigation";
 import { SeatData } from "../lib/types/types";
 
 export function Summary({ selectedSeats }: { selectedSeats: SeatData[] }) {
   const total = selectedSeats.reduce((acc, s) => acc + s.price, 0);
+  const router = useRouter();
+  const handlePaySeat = async () => {
+    try {
+      const response = await fetch("/api/booking", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          seatId: selectedSeats[0]?.id,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        router.push(`/checkout?id=${selectedSeats[0]?.id}`);
+        console.log("hi from client api/booking");
+      } else {
+        alert("Seat already taken!");
+      }
+    } catch (error) {
+      console.error("Lock failed:", error);
+    }
+  };
 
   return (
     <div className="lg:w-96 w-full flex-shrink-0">
@@ -52,6 +76,7 @@ export function Summary({ selectedSeats }: { selectedSeats: SeatData[] }) {
 
           <button
             disabled={selectedSeats.length === 0}
+            onClick={handlePaySeat}
             className={`w-full py-4 rounded-xl font-bold text-white transition-all shadow-lg
               ${
                 selectedSeats.length > 0

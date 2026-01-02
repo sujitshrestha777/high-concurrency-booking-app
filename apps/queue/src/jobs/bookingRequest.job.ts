@@ -56,7 +56,7 @@ export const processBooking = async (job: Job<BookingRequest>) => {
   if (bookingAttemptResult === null) {
     console.warn(`[Worker ${jobId}] Seat ${seatId} could not be locked. It's currently held by another request.`);
 
-    const isCurrentlyLocked = await isSeatLocked(seatId);
+    const isCurrentlyLocked = await isSeatLocked(seatId,userId);
     if (isCurrentlyLocked) {
       await publishSeatUpdate(seatId, 'HELD', `Seat ${seatId} is currently held by someone else.`);
     } else {
