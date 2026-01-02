@@ -1,7 +1,7 @@
 import { Job } from "bullmq"
-import { isSeatLocked, releaseSeatLock } from "../utils/redis.lock";
-import { updateSeatStatusInDB } from "../utils/dbOperation";
-import { redisConnection } from "../utils/redis";
+import { isSeatLocked, releaseSeatLock } from "../utils/redislock.js";
+import { updateSeatStatusInDB } from "../utils/dbOperation.js";
+import { redisConnection } from "../utils/redis.js";
 
 type bookingConfirmationData={
     bookingId:string;

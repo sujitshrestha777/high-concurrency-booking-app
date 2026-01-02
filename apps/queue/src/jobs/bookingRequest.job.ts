@@ -1,7 +1,8 @@
 import { Job } from "bullmq";
-import { isSeatLocked, withSeatLock } from "../utils/redis.lock.js";
+
 import { getSeatStatusFromDB, publishSeatUpdate, updateSeatStatusInDB } from "../utils/dbOperation.js";
 import { redisConnection } from "../utils/redis.js";
+import { isSeatLocked, withSeatLock } from "../utils/redislock.js";
 
 
 
