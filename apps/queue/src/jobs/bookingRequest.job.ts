@@ -33,18 +33,18 @@ export const processBooking = async (job: Job<BookingRequest>) => {
       console.log("???")
     }
  
-    const paymentSuccessful = Math.random() > 0.5;
-    if (!paymentSuccessful) {
-      console.warn(`[Worker ${jobId}] Payment failed for Seat ${seatId}.`);
-      await updateSeatStatusInDB(seatId, 'AVAILABLE', userId);
-      await publishSeatUpdate(seatId, 'AVAILABLE', `Booking failed for ${seatId}. Seat is now available.`);
-      throw new Error(`Payment processing failed for seat ${seatId}.`);
-    }
+    // const paymentSuccessful = Math.random() > 0.5;
+    // if (!paymentSuccessful) {
+    //   console.warn(`[Worker ${jobId}] Payment failed for Seat ${seatId}.`);
+    //   await updateSeatStatusInDB(seatId, 'AVAILABLE', userId);
+    //   await publishSeatUpdate(seatId, 'AVAILABLE', `Booking failed for ${seatId}. Seat is now available.`);
+    //   throw new Error(`Payment processing failed for seat ${seatId}.`);
+    // }
 
-    await redisConnection.publish("SeatUpdateRealtime",JSON.stringify({
-      seatId,
-      type:"Booked"
-    }))
+    // await redisConnection.publish("SeatUpdateRealtime",JSON.stringify({
+    //   seatId,
+    //   type:"Booked"
+    // }))
     console.log(`Redis message booked has been published for SeatID: ${seatId}`)
     await updateSeatStatusInDB(seatId, 'BOOKED', userId);
     console.log(`[Worker ${jobId}] Seat ${seatId} successfully BOOKED in DB for User ${userId}.`);

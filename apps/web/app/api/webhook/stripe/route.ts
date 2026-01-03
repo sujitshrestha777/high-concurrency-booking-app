@@ -1,8 +1,13 @@
 import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
+import { Queue } from "bullmq";
+import { getRedis } from 'lib/redis/redis';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!;
+const paymentQueue = new Queue("paymentsuccess", {
+        connection: getRedis(),
+      });
 
 export async function POST(req: Request) {
   const body = await req.text();
@@ -29,17 +34,21 @@ export async function POST(req: Request) {
       console.log('Session ID:', session.id);
       console.log('Customer email:', session.customer_email);
       console.log('Metadata:', session.metadata);
-      
-      // TODO: Update your database here
-      // - Mark booking as confirmed
-      // - Send confirmation email
-      // - Update inventory
-      
+        
       break;
 
     case 'payment_intent.succeeded':
       const paymentIntent = event.data.object;
       console.log('PaymentIntent was successful!');
+
+      await paymentQueue.add("test-payment", {
+        bookingId: "booking_123",
+        userId: "user_45234326",
+        seatId: "12A",
+        status: "SUCCESS",
+      });
+     console.log("✅ Test payment job added");
+
       break;
 
     case 'payment_intent.payment_failed':
