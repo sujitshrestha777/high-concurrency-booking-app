@@ -17,7 +17,9 @@ export function Summary({ selectedSeats }: { selectedSeats: SeatData[] }) {
       const data = await response.json();
 
       if (data.success) {
-        router.push(`/checkout?id=${selectedSeats[0]?.id}`);
+        router.push(
+          `/checkout?id=${selectedSeats[0]?.id}&class=${selectedSeats[0]?.type}`
+        );
         console.log("hi from client api/booking");
       } else {
         alert("Seat already taken!");

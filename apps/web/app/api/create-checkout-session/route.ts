@@ -3,19 +3,35 @@ import Stripe from 'stripe';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2024-11-20.acacia',
+
 });
+const prices = {
+      'first-class': 25000,  // $250 in cents
+      'second-class': 10000,   // $100 in cents
+    };
+const firstClassPattern = /^(?:[1-9]|1[0-3])[ABDF]$/;
+const secondClassPattern = /^(?:1[4-9]|[2-8][0-9])[A-F]$/;
+
+function checkseatClass(seatId: string): 'first-class' | 'second-class' | null {
+  if (firstClassPattern.test(seatId)) {
+    return 'first-class'; 
+  } else if (secondClassPattern.test(seatId)) {
+    return 'second-class'; 
+  }
+  return null;
+}
 
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const { classType, quantity, bookingDetails } = body;
-
-    // Define your prices
-    const prices = {
-      'first-class': 25000,  // $250 in cents
-      'second-class': 10000,   // $100 in cents
-    };
-
+    const {  quantity, bookingDetails } = body;
+    const classType = checkseatClass(bookingDetails.seatId);
+    if (!classType) {
+      return NextResponse.json(
+        { error: 'Invalid seat ID' },
+        { status: 400 }
+      );
+    }
     // Create checkout session
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
@@ -24,8 +40,8 @@ export async function POST(req: Request) {
           price_data: {
             currency: 'usd',
             product_data: {
-              name: classType === 'first-class' ? 'First Class Ticket' : 'Second Class Ticket',
-              description: `Booking for ${bookingDetails.date} at ${bookingDetails.time}`,
+              name: classType === 'first-class' ? 'Business Class Ticket' : 'Economy Class Ticket',
+              description: `Booking for ${bookingDetails.date} at ${bookingDetails.time} for seat ${bookingDetails.seatId}`,
             },
             unit_amount: prices[classType as keyof typeof prices],
           },

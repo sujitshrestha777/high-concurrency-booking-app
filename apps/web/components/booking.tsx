@@ -16,7 +16,8 @@ export default function BookingForm() {
   const [seatId, setSeatID] = useState("");
 
   const searchparams = useSearchParams();
-  const seatid = searchparams.get("id");
+  const seatIdParams = searchparams.get("id");
+  const classTypeParams = searchparams.get("class");
 
   const prices = {
     "first-class": 250,
@@ -32,6 +33,12 @@ export default function BookingForm() {
 
     try {
       // Step 1: Create checkout session
+      console.log(
+        "classtypeparams and seatIdParams",
+        classTypeParams,
+        seatIdParams
+      );
+
       const response = await fetch("/api/create-checkout-session", {
         method: "POST",
         headers: {
@@ -43,6 +50,7 @@ export default function BookingForm() {
           bookingDetails: {
             date,
             time,
+            seatId: seatIdParams,
             userId: "user_123", // Replace with actual user ID
           },
         }),
@@ -89,7 +97,7 @@ export default function BookingForm() {
                 className="mr-3"
               />
               <div className="flex-1">
-                <div className="font-medium">First Class {seatid}</div>
+                <div className="font-medium">First Class {seatIdParams}</div>
                 <div className="text-sm text-gray-600">
                   ${prices["first-class"]} per ticket
                 </div>
