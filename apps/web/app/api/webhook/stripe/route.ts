@@ -38,15 +38,15 @@ export async function POST(req: Request) {
       break;
 
     case 'payment_intent.succeeded':
-      const paymentIntent = event.data.object;
-      console.log('PaymentIntent was successful!');
+      // const paymentIntent = event.data.object;
+      // console.log('PaymentIntent was successful!');
 
-      await paymentQueue.add("test-payment", {
-        bookingId: "booking_123",
-        userId: "user_45234326",
-        seatId: "12A",
-        status: "SUCCESS",
-      });
+      // await paymentQueue.add("test-payment", {
+      //   bookingId: "booking_123",
+      //   userId: "user_45234326",
+      //   seatId: "12A",
+      //   status: "SUCCESS",
+      // });
      console.log("✅ Test payment job added");
 
       break;

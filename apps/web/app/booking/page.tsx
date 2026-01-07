@@ -23,7 +23,7 @@ export default function BookingPage() {
       if (exists) {
         return prev.filter((s) => s.id !== seat.id);
       }
-      return [...prev, seat];
+      return [seat];
     });
   };
 
