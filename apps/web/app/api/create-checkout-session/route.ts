@@ -9,7 +9,7 @@ const prices = {
       'first-class': 25000,  // $250 in cents
       'second-class': 10000,   // $100 in cents
     };
-const firstClassPattern = /^(?:[1-9]|1[0-3])[ABDF]$/;
+const firstClassPattern = /^(?:[1-9]|1[0-3])[ABEF]$/;
 const secondClassPattern = /^(?:1[4-9]|[2-8][0-9])[A-F]$/;
 
 function checkseatClass(seatId: string): 'first-class' | 'second-class' | null {
