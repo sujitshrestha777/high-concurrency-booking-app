@@ -5,7 +5,7 @@ import { MonitorCog, UserPen, LogOut } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { getUserDetails } from "lib/auth/getUserDetail";
-import { signOut, signIn } from "next-auth/react";
+
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,6 +15,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { handleSignOut } from "lib/auth/handleSignOut";
+import { handleGoogleSignIn } from "lib/auth/handleGoogleSignIn";
 
 export function Navbar() {
   const [user, setUser] = useState<any>(null);
@@ -23,7 +25,7 @@ export function Navbar() {
 
   const handleLogout = async () => {
     setIsLoggingOut(true);
-    await signOut({ callbackUrl: "/" });
+    await handleSignOut();
   };
   useEffect(() => {
     const fetchUser = async () => {
@@ -157,7 +159,10 @@ export function Navbar() {
               </DropdownMenu>
             </div>
           ) : (
-            <Button onClick={() => signIn("google")} className="font-semibold">
+            <Button
+              onClick={() => handleGoogleSignIn()}
+              className="font-semibold"
+            >
               Login
             </Button>
           )}
