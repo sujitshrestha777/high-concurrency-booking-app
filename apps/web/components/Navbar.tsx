@@ -1,10 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { MonitorCog, UserPen, LogOut } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { getUserDetails } from "lib/auth/getUserDetail";
-import { signOut, signIn } from "next-auth/react"; // Assuming Auth.js
+import { signOut, signIn } from "next-auth/react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -18,7 +19,12 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 export function Navbar() {
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
+  const handleLogout = async () => {
+    setIsLoggingOut(true);
+    await signOut({ callbackUrl: "/" });
+  };
   useEffect(() => {
     const fetchUser = async () => {
       try {
@@ -76,7 +82,7 @@ export function Navbar() {
                     variant="ghost"
                     className="relative h-10 w-10 rounded-full p-0"
                   >
-                    <Avatar className="h-10 w-10 border border-gray-800">
+                    <Avatar className="h-10 w-10 border-2  border-white ">
                       <AvatarImage src={user.image} alt={user.name} />
                       <AvatarFallback className="bg-gray-800 text-white">
                         {user.name?.charAt(0).toUpperCase()}
@@ -85,35 +91,67 @@ export function Navbar() {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent
-                  className="w-56 mt-2"
+                  className="w-56 mt-2 border border-white/10 bg-gray-900"
                   align="end"
                   forceMount
                 >
                   <DropdownMenuLabel className="font-normal">
-                    <div className="flex flex-col space-y-1">
-                      <p className="text-sm font-medium leading-none">
-                        {user.name}
-                      </p>
-                      <p className="text-xs leading-none text-muted-foreground">
-                        {user.email}
-                      </p>
+                    <div className="flex gap-2">
+                      <Avatar className="h-10 w-10 ">
+                        <AvatarImage src={user.image} alt={user.name} />
+                        <AvatarFallback className="bg-gray-800 text-white">
+                          {user.name?.charAt(0).toUpperCase()}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="flex flex-col space-y-1">
+                        <p className="text-base font-medium leading-none text-white">
+                          {user.name}
+                        </p>
+                        <p className="text-xs leading-none text-muted-foreground text-gray-500">
+                          {user.email}
+                        </p>
+                      </div>
                     </div>
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem asChild>
-                    <Link href="/profile">Profile Settings</Link>
+                  <DropdownMenuItem
+                    asChild
+                    className="group text-white focus:bg-gray-800 focus:text-white cursor-pointer outline-none transition-colors "
+                  >
+                    <Link href="/profile">
+                      {" "}
+                      <UserPen className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
+                      Profile Settings
+                    </Link>
                   </DropdownMenuItem>
                   {user.role === "ADMIN" && (
-                    <DropdownMenuItem asChild>
-                      <Link href="/admin">Admin Dashboard</Link>
+                    <DropdownMenuItem
+                      asChild
+                      className="group text-white focus:bg-gray-800 focus:text-white cursor-pointer outline-none transition-colors "
+                    >
+                      <Link href="/admin">
+                        {" "}
+                        <MonitorCog className="h-4 w-4 transition-transform group-hover:-translate-x-1" />{" "}
+                        Admin Dashboard
+                      </Link>
                     </DropdownMenuItem>
                   )}
                   <DropdownMenuSeparator />
                   <DropdownMenuItem
-                    className="text-red-500 cursor-pointer"
-                    onClick={() => signOut()}
+                    className="group flex items-center gap-2 px-2 py-2 text-red-400 cursor-pointer outline-none transition-all duration-200 focus:bg-red-500/10 focus:text-red-500 "
+                    onClick={(e) => {
+                      e.preventDefault();
+                      handleLogout();
+                    }}
                   >
-                    Log out
+                    {isLoggingOut ? (
+                      <div className="h-4 w-4 animate-spin border-2 border-red-500 border-t-transparent rounded-full" />
+                    ) : (
+                      <LogOut className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
+                    )}
+                    <span className="font-medium">
+                      {isLoggingOut ? "Logging out..." : "Log out"}
+                    </span>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
