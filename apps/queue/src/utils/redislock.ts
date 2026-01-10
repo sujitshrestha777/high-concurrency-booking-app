@@ -2,9 +2,9 @@
 import { redisConnection } from "./redis.js";
  
 export const trylockseat=async(seatId:string,userId:string)=>{
-    const lockKey=`lock:seat:${seatId}:${userId}`;
+    const lockKey=`lock:seat:${seatId}`;
     try {
-        const result = await redisConnection.set(lockKey,"locked","EX",180,"NX")
+        const result = await redisConnection.set(lockKey,userId,"EX",180,"NX")
         if(result==="OK"){
             console.log("successfully added the seat to lock in redis",result);
             console.log(" lockkey",lockKey);
@@ -16,8 +16,25 @@ export const trylockseat=async(seatId:string,userId:string)=>{
        return false 
     }
 }
-export const releaseSeatLock=async(seatId:string,userId:string)=>{
-        const lockKey=`lock:seat:${seatId}:${userId}`;
+export const IslockedUserSame=async(seatId:string,userId:string)=>{
+    const lockKey=`lock:seat:${seatId}`;
+    try {
+        const lockedUserId=await redisConnection.get(lockKey);      
+        if(lockedUserId===userId){
+            console.log(`the lock user ${lockedUserId} is same as current user ${userId}`); 
+            return true;
+        }   
+        console.log(`the lock user ${lockedUserId} is different from current user ${userId}`); 
+        return false;     
+    }           
+    catch (error) {
+        console.log("error while comparing the lock user and current user ",error);
+        return false;
+    }                       
+}
+
+export const releaseSeatLock=async(seatId:string)=>{
+        const lockKey=`lock:seat:${seatId}`;
         try {
             const result=await redisConnection.del(lockKey);
             if(result===1){
@@ -34,8 +51,8 @@ export const releaseSeatLock=async(seatId:string,userId:string)=>{
             return false;
         }
 }
-export const isSeatLocked = async (seatId: string,userId:string): Promise<boolean> => {
-    const lockKey = `lock:seat:${seatId}:${userId}`;
+export const isSeatLocked = async (seatId: string): Promise<boolean> => {
+    const lockKey = `lock:seat:${seatId}`;
     console.log(`[Lock] Checking if ${lockKey} is locked`);
     try {
         const exists = await redisConnection.exists(lockKey);
@@ -63,10 +80,5 @@ export const withSeatLock=async<T>(seatId:string,userId:string,callback:()=>Prom
     }catch (error) {
         console.log(`error ocured while locking in withseatlock error:${error}`);
         throw error
-    }finally{
-         if (lockAcquired) {
-            await releaseSeatLock(seatId,userId);
-            console.log(` Lock for seat ${seatId} released `);
-        }
-    } 
-}
+    }
+} 

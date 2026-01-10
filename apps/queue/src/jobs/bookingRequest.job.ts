@@ -1,8 +1,8 @@
 import { Job } from "bullmq";
 
-import { getSeatStatusFromDB, publishSeatUpdate, updateSeatStatusInDB } from "../utils/dbOperation.js";
+import { getSeatStatusFromDB, publishSeatUpdate } from "../utils/dbOperation.js";
 import { redisConnection } from "../utils/redis.js";
-import { isSeatLocked, withSeatLock } from "../utils/redislock.js";
+import {withSeatLock } from "../utils/redislock.js";
 
 
 
@@ -15,59 +15,70 @@ export const processBooking = async (job: Job<BookingRequest>) => {
   const { userId, seatId } = job.data;
   const jobId = job.id;
 
-  console.log(`[Worker ${jobId}] Received booking job for Seat: ${seatId}, User: ${userId}`);
+  console.log(`[Worker ${jobId}] Processing seat ${seatId} for user ${userId}`);
 
-  const bookingAttemptResult = await withSeatLock(seatId,userId, async () => {
-    console.log(`[Worker ${jobId}] Lock acquired for Seat ${seatId}. Proceeding with booking logic.`);
-
-    await redisConnection.publish("SeatUpdateRealtime",JSON.stringify({
-      seatId,
-      type:"Locked"
-    }))
-    console.log("the locked7min redis message published!!!")
-    const currentDbStatus = await getSeatStatusFromDB(seatId);
-    if (currentDbStatus?.status === 'BOOKED' || currentDbStatus?.status === 'HELD') {
-      console.warn(`[Worker ${jobId}] Seat ${seatId} already ${currentDbStatus} in DB. Aborting booking within lock.`);
-      throw new Error(`Seat ${seatId} is already booked or unavailable in DB.`);
-      //add new seatpayment option of same category 
-      console.log("???")
-    }
  
-    // const paymentSuccessful = Math.random() > 0.5;
-    // if (!paymentSuccessful) {
-    //   console.warn(`[Worker ${jobId}] Payment failed for Seat ${seatId}.`);
-    //   await updateSeatStatusInDB(seatId, 'AVAILABLE', userId);
-    //   await publishSeatUpdate(seatId, 'AVAILABLE', `Booking failed for ${seatId}. Seat is now available.`);
-    //   throw new Error(`Payment processing failed for seat ${seatId}.`);
-    // }
-
-    // await redisConnection.publish("SeatUpdateRealtime",JSON.stringify({
-    //   seatId,
-    //   type:"Booked"
-    // }))
-    console.log(`Redis message booked has been published for SeatID: ${seatId}`)
-    await updateSeatStatusInDB(seatId, 'BOOKED', userId);
-    console.log(`[Worker ${jobId}] Seat ${seatId} successfully BOOKED in DB for User ${userId}.`);
-
-    await publishSeatUpdate(seatId, 'BOOKED', `Seat ${seatId} is now booked!`);
-
-    return { success: true, seatId: seatId, userId: userId, message: 'Booking completed' };
-  });
-
-  if (bookingAttemptResult === null) {
-    console.warn(`[Worker ${jobId}] Seat ${seatId} could not be locked. It's currently held by another request.`);
-
-    const isCurrentlyLocked = await isSeatLocked(seatId,userId);
-    if (isCurrentlyLocked) {
-      await publishSeatUpdate(seatId, 'HELD', `Seat ${seatId} is currently held by someone else.`);
-    } else {
-      await publishSeatUpdate(seatId, 'UNAVAILABLE', `Seat ${seatId} is temporarily unavailable.`);
-    }
-    throw new Error(`Booking for seat ${seatId} failed: Seat is currently locked.`);
+  const preCheck = await getSeatStatusFromDB(seatId);
+  if (preCheck?.status === 'BOOKED') {
+    await publishSeatUpdate(seatId, 'BOOKED', 'Seat already booked');
+    throw new Error(`Seat ${seatId} is already booked`);
   }
 
-  console.log(`[Worker ${jobId}] Booking job for ${seatId} finished. Result:`, bookingAttemptResult);
-};
 
+  const lockResult = await withSeatLock(seatId,userId, async () => {
+    console.log(`[Worker ${jobId}] Lock acquired for ${seatId}`);
+
+   
+    const dbStatus = await getSeatStatusFromDB(seatId);
+    if (dbStatus?.status === 'BOOKED' || dbStatus?.status === 'HELD') {
+      console.warn(`[Worker ${jobId}] Seat ${seatId} status changed to ${dbStatus.status}`);
+      throw new Error(`Seat ${seatId} is no longer available`);
+    }
+
+
+    // await updateSeatStatusInDB(seatId, 'HELD', userId);
+    console.log(`[Worker ${jobId}] Seat ${seatId} marked as HELD in DB`);
+
+  
+    try {
+      await redisConnection.publish("SeatUpdateRealtime", JSON.stringify({
+        seatId,
+        type:"Locked",
+        userId,
+        heldUntil: Date.now() + 180000, // 3 min
+        timestamp: Date.now()
+      }));
+      console.log(`[Worker ${jobId}] Published HELD status for ${seatId}`);
+    } catch (pubError) {
+      console.error(`[Worker ${jobId}] Pub/sub failed (non-critical):`, pubError);
+    }
+
+   
+    return { 
+      success: true, 
+      seatId, 
+      userId, 
+      heldUntil: Date.now() + 180000 
+    };
+  });
+
+
+  if (lockResult === null) {
+    console.warn(`[Worker ${jobId}] Could not acquire lock for ${seatId}`);
+    
+
+    const currentStatus = await getSeatStatusFromDB(seatId);
+    await publishSeatUpdate(
+      seatId, 
+      currentStatus?.status || 'UNAVAILABLE',
+      `Seat ${seatId} is currently held by another user`
+    );
+    
+    throw new Error(`Seat ${seatId} is currently locked`);
+  }
+
+  console.log(`[Worker ${jobId}] Successfully processed ${seatId}`);
+  return lockResult;
+};
 
 

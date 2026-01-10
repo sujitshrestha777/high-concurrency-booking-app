@@ -43,7 +43,6 @@ export function SeatMap({ rows, selectedSeatIds, onSeatToggle }: SeatMapProps) {
         console.error("Error fetching booked seats:", error);
       }
     }
-
     fetchBookedSeats();
   }, []);
 
