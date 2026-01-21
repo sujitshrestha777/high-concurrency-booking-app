@@ -29,24 +29,33 @@ export async function POST(req: Request) {
   switch (event.type) {
     case 'checkout.session.completed':
       const session = event.data.object as Stripe.Checkout.Session;
-      
-      console.log('Payment successful!');
-      console.log('Session ID:', session.id);
-      console.log('Customer email:', session.customer_email);
-      console.log('Metadata:', session.metadata);
+      console.log('Checkout Session completed:', session);
+
         
       break;
 
     case 'payment_intent.succeeded':
-      // const paymentIntent = event.data.object;
-      // console.log('PaymentIntent was successful!');
+      const paymentIntent = event.data.object;
+      console.log('PaymentIntent was successful!' );
+      const { userId, seatId, classType, date, time } = paymentIntent.metadata;
+      console.log(`Booking ID: , User ID: ${userId}, Seat ID: ${seatId}  :`,paymentIntent.metadata);
 
-      // await paymentQueue.add("test-payment", {
-      //   bookingId: "booking_123",
-      //   userId: "user_45234326",
-      //   seatId: "12A",
-      //   status: "SUCCESS",
-      // });
+    try {
+        await paymentQueue.add("test-payment", {
+          bookingId: "booking_123",
+          userId,
+          seatId,
+          status: "SUCCESS",
+        }); 
+    } catch (error) {
+      console.error("Error adding payment job to queue:", error);
+      await paymentQueue.add("test-payment", {
+        bookingId: "booking_123",
+        userId,
+        seatId,
+        status: "FAILED",
+      });
+    }
      console.log("✅ Test payment job added");
 
       break;

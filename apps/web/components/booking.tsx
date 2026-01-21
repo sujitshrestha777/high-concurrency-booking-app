@@ -6,7 +6,7 @@ import { useState } from "react";
 
 export default function BookingForm() {
   const [classType, setClassType] = useState<"first-class" | "second-class">(
-    "first-class"
+    "first-class",
   );
   const [quantity, setQuantity] = useState(1);
   const [date, setDate] = useState("");
@@ -36,7 +36,7 @@ export default function BookingForm() {
       console.log(
         "classtypeparams and seatIdParams",
         classTypeParams,
-        seatIdParams
+        seatIdParams,
       );
 
       const response = await fetch("/api/create-checkout-session", {
@@ -45,13 +45,11 @@ export default function BookingForm() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          classType,
           quantity,
           bookingDetails: {
             date,
             time,
             seatId: seatIdParams,
-            userId: "user_123", // Replace with actual user ID
           },
         }),
       });

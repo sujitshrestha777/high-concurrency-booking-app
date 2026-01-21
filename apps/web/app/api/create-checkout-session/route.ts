@@ -1,14 +1,17 @@
+import { auth } from 'lib/auth/auth';
+import { Search } from 'lucide-react';
+import { redirect } from 'next/navigation';
 import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2024-11-20.acacia',
-
 });
 const prices = {
       'first-class': 25000,  // $250 in cents
       'second-class': 10000,   // $100 in cents
     };
+
 const firstClassPattern = /^(?:[1-9]|1[0-3])[ABEF]$/;
 const secondClassPattern = /^(?:1[4-9]|[2-8][0-9])[A-F]$/;
 
@@ -32,6 +35,11 @@ export async function POST(req: Request) {
         { status: 400 }
       );
     }
+    const authSession = await auth();
+    if (!authSession) {
+      redirect('/auth/sign-in');
+    }
+  const userId = authSession.user.id;
     // Create checkout session
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
@@ -55,8 +63,19 @@ export async function POST(req: Request) {
         classType: classType,
         quantity: quantity.toString(),
         date: bookingDetails.date,
+        seatId: bookingDetails.seatId,
         time: bookingDetails.time,
-        userId: bookingDetails.userId || 'guest',
+        userId: userId || 'guest',
+      },
+      payment_intent_data: {  
+       metadata: {
+        classType: classType,
+        quantity: quantity.toString(),
+        seatId: bookingDetails.seatId,
+        date: bookingDetails.date,
+        time: bookingDetails.time,
+        userId: userId || 'guest',
+      },
       },
     });
 

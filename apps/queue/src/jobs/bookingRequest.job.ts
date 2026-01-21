@@ -2,7 +2,7 @@ import { Job } from "bullmq";
 
 import { getSeatStatusFromDB, publishSeatUpdate } from "../utils/dbOperation.js";
 import { redisConnection } from "../utils/redis.js";
-import {withSeatLock } from "../utils/redislock.js";
+import {releaseSeatLock, withSeatLock } from "../utils/redislock.js";
 
 
 
@@ -21,6 +21,7 @@ export const processBooking = async (job: Job<BookingRequest>) => {
   const preCheck = await getSeatStatusFromDB(seatId);
   if (preCheck?.status === 'BOOKED') {
     await publishSeatUpdate(seatId, 'BOOKED', 'Seat already booked');
+    console.log(`[Worker ${jobId}] Seat ${seatId} is already booked in pre-check`);
     throw new Error(`Seat ${seatId} is already booked`);
   }
 
@@ -33,6 +34,7 @@ export const processBooking = async (job: Job<BookingRequest>) => {
     if (dbStatus?.status === 'BOOKED' || dbStatus?.status === 'HELD') {
       console.warn(`[Worker ${jobId}] Seat ${seatId} status changed to ${dbStatus.status}`);
       throw new Error(`Seat ${seatId} is no longer available`);
+      releaseSeatLock(seatId);
     }
 
 

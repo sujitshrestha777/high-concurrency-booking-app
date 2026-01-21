@@ -1,5 +1,8 @@
-// // apps/queue/test.ts
+// apps/queue/test.ts
+// import { get } from "http";
+
 // import { bookingQueue } from "./queues/booking.queue.js";
+
 // function getRandomSeatId() {
 //   const seatTypes = ["A", "B",];
 //   const row =  Math.floor(Math.random()*88)+1
@@ -7,13 +10,14 @@
 //   return `${row}${type}`;
 // }
 
+
 // (async () => {
-//   for (let i = 0; i < 10; i++) {
+//   // for (let i = 0; i < 10; i++) {
 //     await bookingQueue.add("booking", {
 //       userId: 'cma6td4xb0003usns9hg3ral2',
-//       seatId:getRandomSeatId(),
+//       seatId:'3E',
 //     });
-//   }
+//   // }
 
 //   console.log("✅ 10 fake jobs added");
 // })();
@@ -28,8 +32,8 @@ const paymentQueue = new Queue("paymentsuccess", {
 
 await paymentQueue.add("test-payment", {
   bookingId: "booking_123",
-  userId: "user_456",
-  seatId: "12A",
+  userId: "cma6td4xb0003usns9hg3ral2",
+  seatId: "3E",
   status: "SUCCESS",
 });
 

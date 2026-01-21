@@ -1,5 +1,4 @@
 
-import { error } from "console";
 import { auth } from "lib/auth/auth";
 import { getBookingQueue } from "lib/queue/queue";
 import { getbookingLimiter } from "lib/ratelimit";
@@ -21,18 +20,19 @@ export async function POST(req:NextRequest) {
         )
     }
     try {
-        // const session = await auth();
-        // if (!session) {
-        //         redirect("/auth/sign-in");
-        //     }
-        // const userId=session.user.id
+        const session = await auth();
+        if (!session) {
+                redirect("/auth/sign-in");
+            }
+        const sessionuserId=session.user.id
+        console.log("session user id",sessionuserId);
         const {seatId}=await req.json() 
         
         const queue=getBookingQueue();
         const job=await queue.add(
             "booking",
             {
-                userId,
+                userId:sessionuserId,
                 seatId
             },
             {
