@@ -7,11 +7,19 @@ interface SeatMapProps {
   selectedSeatIds: string[];
   onSeatToggle: (seat: SeatData) => void;
 }
+type lockedSeatsType = {
+  seatId: string;
+  TTL: number;
+};
 
 export function SeatMap({ rows, selectedSeatIds, onSeatToggle }: SeatMapProps) {
   const [seatStatuses, setSeatStatuses] = useState<{
     [seatId: string]: string;
   }>({ "24D": "locked" });
+  const [lockedSeats, setlockedSeats] = useState<lockedSeatsType[]>([
+    { seatId: "24D", TTL: 123 },
+    { seatId: "24D", TTL: 123 },
+  ]);
   let economyHeaderDisplayed = true;
 
   useEffect(() => {
@@ -47,6 +55,26 @@ export function SeatMap({ rows, selectedSeatIds, onSeatToggle }: SeatMapProps) {
   }, []);
 
   useEffect(() => {
+    const seatlockSeatintervalTime = () => {
+      let expiredSeatLocked: string[] = [];
+      lockedSeats.forEach((lockedSeat) => {
+        if (lockedSeat.TTL - Date.now() < 0) {
+          expiredSeatLocked.push(lockedSeat.seatId);
+        }
+      });
+      setSeatStatuses((prev) => {
+        const update = { ...prev };
+        expiredSeatLocked.forEach((seatId) => {
+          delete update[seatId];
+        });
+        return update;
+      });
+      setlockedSeats((prev) =>
+        prev.filter((lockseat) => !expiredSeatLocked.includes(lockseat.seatId)),
+      );
+    };
+  });
+  useEffect(() => {
     const ws = new WebSocket("ws://localhost:8080");
 
     ws.onopen = () => {
@@ -63,6 +91,8 @@ export function SeatMap({ rows, selectedSeatIds, onSeatToggle }: SeatMapProps) {
           ...prev,
           [message.data.seatId]: message.data.type,
         }));
+      }
+      if ((message.type = "initial_seat_locks")) {
       }
     };
 

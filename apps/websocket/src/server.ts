@@ -24,7 +24,7 @@ wss.on('connection', async(ws) => {
     const seatId= keys.replace('lock:seat:','');
     const lockedUserId=await redisClient.get(keys);
     const TTL=await redisClient.ttl(keys);
-
+    console.log(`Seat ${seatId} is locked by user ${lockedUserId} with TTL ${TTL}`);
     if(TTL>0){
       initialSeatLocks.push({
         seatId, 
@@ -33,6 +33,10 @@ wss.on('connection', async(ws) => {
         ttl:Date.now()+TTL*1000
       })
     }
+  }
+
+  if(initialSeatLocks.length>0){
+    
     ws.send(JSON.stringify({
       type: 'initial_seat_locks',
       data: initialSeatLocks,
