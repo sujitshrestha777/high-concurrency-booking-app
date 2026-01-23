@@ -19,18 +19,18 @@ wss.on('connection', async(ws) => {
   }));
 
   const lockkeys= await redisClient.keys('lock:seat:*')
-  let initialSeatLocks=[{seatId:'24E', ttl:100},{seatId:'25E', ttl:180}];  
+  let initialSeatLocks=[{seatId:'24E', TTL:100},{seatId:'25E', TTL:180}];  
   for (const keys of lockkeys){
     const seatId= keys.replace('lock:seat:','');
     const lockedUserId=await redisClient.get(keys);
-    const TTL=await redisClient.ttl(keys);
-    console.log(`Seat ${seatId} is locked by user ${lockedUserId} with TTL ${TTL}`);
-    if(TTL>0){
+    const ttl=await redisClient.ttl(keys);
+    console.log(`Seat ${seatId} is locked by user ${lockedUserId} with TTL ${ttl}`);
+    if(ttl>0){
       initialSeatLocks.push({
         seatId, 
         // userId:lockedUserId,
         // type:"Locked",
-        ttl:Date.now()+TTL*1000
+        TTL:Date.now()+ttl*1000
       })
     }
   }
@@ -74,7 +74,7 @@ redisPubSub.on('message', (channel, message) => {
       clients.forEach(client => {
         if (client.readyState === WebSocket.OPEN) {
           client.send(JSON.stringify({
-            type: 'seat_update',
+            type: seatUpdate.type,
             data: seatUpdate,
             timestamp: Date.now()
           }));

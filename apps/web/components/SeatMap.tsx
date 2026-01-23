@@ -85,7 +85,6 @@ export function SeatMap({ rows, selectedSeatIds, onSeatToggle }: SeatMapProps) {
       const message: WSMessage = JSON.parse(event.data);
       console.log("from ws server:", message);
 
-      // Update seat status map
       if (message.data?.seatId && message.data?.type) {
         setSeatStatuses((prev) => ({
           ...prev,
@@ -93,7 +92,7 @@ export function SeatMap({ rows, selectedSeatIds, onSeatToggle }: SeatMapProps) {
         }));
       }
       if (message.type === "initial_seat_locks") {
-        let initialSeatLocks: lockedSeatsType[] = message.data;
+        const initialSeatLocks: lockedSeatsType[] = message.data;
         console.log("hello from WS as the initail locks", initialSeatLocks);
         const newSeatStatus = initialSeatLocks.reduce(
           (acc, seat) => {
@@ -103,6 +102,23 @@ export function SeatMap({ rows, selectedSeatIds, onSeatToggle }: SeatMapProps) {
           {} as { [seatId: string]: string },
         );
         setSeatStatuses((prev) => ({ ...prev, ...newSeatStatus }));
+        setlockedSeats((prev) => {
+          const seatMap = new Map<string, lockedSeatsType>();
+          prev.forEach((s) => seatMap.set(s.seatId, s));
+          initialSeatLocks.forEach((s) => seatMap.set(s.seatId, s));
+          return Array.from(seatMap.values());
+        });
+      }
+
+      if (message.type === "Locked") {
+        const { type, TTL, seatId } = message.data;
+        const newlockedseat = { seatId, TTL };
+        const newSeatStatus = { [seatId]: "locked" };
+        setSeatStatuses((prev) => ({ ...prev, ...newSeatStatus }));
+        setlockedSeats((prev) => {
+          const filter = prev.filter((s) => s.seatId != newlockedseat.seatId);
+          return [...filter, newlockedseat];
+        });
       }
     };
 
@@ -113,9 +129,10 @@ export function SeatMap({ rows, selectedSeatIds, onSeatToggle }: SeatMapProps) {
     return () => ws.close();
   }, []);
 
-  // useEffect(() => {
-  //   console.log("seatstatus after initiallock seat allocation", seatStatuses);
-  // }, [seatStatuses]);
+  useEffect(() => {
+    console.log("seatstatus after initiallock seat allocation", seatStatuses);
+    console.log("lockedseats after intiallock lockedseats", lockedSeats);
+  }, [seatStatuses, lockedSeats]);
 
   return (
     <div className="flex-1 relative overflow-hidden bg-gray-900/30 border border-white/10 rounded-2xl backdrop-blur-sm flex flex-col">

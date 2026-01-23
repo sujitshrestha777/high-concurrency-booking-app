@@ -46,9 +46,7 @@ export const processBooking = async (job: Job<BookingRequest>) => {
       await redisConnection.publish("SeatUpdateRealtime", JSON.stringify({
         seatId,
         type:"Locked",
-        userId,
-        heldUntil: Date.now() + 180000, // 3 min
-        timestamp: Date.now()
+        TTL: Date.now() + 180000, // 3 min
       }));
       console.log(`[Worker ${jobId}] Published HELD status for ${seatId}`);
     } catch (pubError) {
