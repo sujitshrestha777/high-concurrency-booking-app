@@ -20,7 +20,7 @@ export const bookingConfirmationJob=async(job:Job<bookingConfirmationData>)=>{
         
             await redisConnection.publish("SeatUpdateRealtime",JSON.stringify({
                 seatId,
-                userId,
+                // userId,
                 type:"Booked"
             }))
             await releaseSeatLock(seatId);

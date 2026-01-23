@@ -120,6 +120,15 @@ export function SeatMap({ rows, selectedSeatIds, onSeatToggle }: SeatMapProps) {
           return [...filter, newlockedseat];
         });
       }
+
+      if (message.type === "Booked") {
+        const { seatId } = message.data;
+        // const newSeatStatus = { [seatId]: "booked" };
+        setSeatStatuses((prev) => ({ ...prev, [seatId]: "booked" }));
+        setlockedSeats((prev) =>
+          prev.filter((lockseat) => lockseat.seatId != seatId),
+        );
+      }
     };
 
     ws.onerror = (error) => {

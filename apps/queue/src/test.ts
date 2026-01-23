@@ -32,8 +32,8 @@ const paymentQueue = new Queue("paymentsuccess", {
 
 await paymentQueue.add("test-payment", {
   bookingId: "booking_123",
-  userId: "cma6td4xb0003usns9hg3ral2",
-  seatId: "3E",
+  userId: "cma6tcifm0000usnsiqmzdhxi",
+  seatId: "37D",
   status: "SUCCESS",
 });
 
