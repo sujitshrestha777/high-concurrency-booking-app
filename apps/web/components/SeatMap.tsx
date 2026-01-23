@@ -15,7 +15,7 @@ type lockedSeatsType = {
 export function SeatMap({ rows, selectedSeatIds, onSeatToggle }: SeatMapProps) {
   const [seatStatuses, setSeatStatuses] = useState<{
     [seatId: string]: string;
-  }>({ "24D": "locked" });
+  }>({ "24D": "locked", "25D": "locked", "26D": "booked" });
   const [lockedSeats, setlockedSeats] = useState<lockedSeatsType[]>([
     { seatId: "24D", TTL: 123 },
     { seatId: "24D", TTL: 123 },
@@ -92,7 +92,17 @@ export function SeatMap({ rows, selectedSeatIds, onSeatToggle }: SeatMapProps) {
           [message.data.seatId]: message.data.type,
         }));
       }
-      if ((message.type = "initial_seat_locks")) {
+      if (message.type === "initial_seat_locks") {
+        let initialSeatLocks: lockedSeatsType[] = message.data;
+        console.log("hello from WS as the initail locks", initialSeatLocks);
+        const newSeatStatus = initialSeatLocks.reduce(
+          (acc, seat) => {
+            acc[seat.seatId] = "locked";
+            return acc;
+          },
+          {} as { [seatId: string]: string },
+        );
+        setSeatStatuses((prev) => ({ ...prev, ...newSeatStatus }));
       }
     };
 
@@ -102,6 +112,10 @@ export function SeatMap({ rows, selectedSeatIds, onSeatToggle }: SeatMapProps) {
 
     return () => ws.close();
   }, []);
+
+  // useEffect(() => {
+  //   console.log("seatstatus after initiallock seat allocation", seatStatuses);
+  // }, [seatStatuses]);
 
   return (
     <div className="flex-1 relative overflow-hidden bg-gray-900/30 border border-white/10 rounded-2xl backdrop-blur-sm flex flex-col">
