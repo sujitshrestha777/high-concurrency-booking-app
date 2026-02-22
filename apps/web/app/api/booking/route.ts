@@ -21,8 +21,11 @@ export async function POST(req:NextRequest) {
     }
     try {
         const session = await auth();
-        if (!session) {
-                redirect("/auth/sign-in");
+        if (!session) { 
+                return NextResponse.json(
+                { message: "Unauthorized" },
+                { status: 401 }
+        );
             }
         const sessionuserId=session.user.id
         console.log("session user id",sessionuserId);

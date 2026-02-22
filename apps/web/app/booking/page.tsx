@@ -2,7 +2,6 @@
 
 import { SeatMap } from "components/SeatMap";
 import { Summary } from "components/Summary";
-import { SeatUpdate } from "components/SeatUpdate";
 import { SeatData, SeatRow } from "lib/types/types";
 import { generatePlaneLayout } from "lib/util/util";
 import { useState, useEffect } from "react";

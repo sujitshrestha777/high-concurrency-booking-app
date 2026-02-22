@@ -43,12 +43,16 @@ const AuthPage = () => {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-100">
-      <div className="w-full max-w-md rounded-lg bg-white p-8 shadow-md">
-        <h1 className="mb-6 text-center text-2xl font-bold">Sign In</h1>
+    <div className="flex min-h-screen items-center justify-center bg-black relative">
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,#1f1f1f_1px,transparent_1px),linear-gradient(to_bottom,#1f1f1f_1px,transparent_1px)] bg-[size:50px_50px] opacity-30" />
+
+      <div className="w-full max-w-md rounded-xl bg-black/40 backdrop-blur-sm border border-white/10 p-8 shadow-2xl relative z-10">
+        <h1 className="mb-6 text-center text-2xl font-bold text-white">
+          Sign In
+        </h1>
         <div className="social-logins">
           <button
-            className="flex w-full items-center justify-center gap-2 rounded-md bg-white px-4 py-2 text-gray-700 shadow-md hover:bg-gray-50"
+            className="flex w-full items-center justify-center gap-3 rounded-lg bg-white/5 border border-white/10 px-4 py-3 text-white/80 hover:bg-white/10 hover:border-white/20 transition-all"
             onClick={handleGoogleSignIn}
           >
             <svg className="h-5 w-5" viewBox="0 0 24 24">

@@ -1,5 +1,6 @@
-import { useRouter } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 import { SeatData } from "../lib/types/types";
+import { auth } from "lib/auth/auth";
 
 export function Summary({ selectedSeats }: { selectedSeats: SeatData[] }) {
   const total = selectedSeats.reduce((acc, s) => acc + s.price, 0);
@@ -15,10 +16,13 @@ export function Summary({ selectedSeats }: { selectedSeats: SeatData[] }) {
       });
 
       const data = await response.json();
-
+      if (response.status == 401) {
+        router.push("/auth/sign-in");
+        return;
+      }
       if (data.success) {
         router.push(
-          `/checkout?id=${selectedSeats[0]?.id}&class=${selectedSeats[0]?.type}`
+          `/checkout?id=${selectedSeats[0]?.id}&class=${selectedSeats[0]?.type}`,
         );
         console.log("hi from client api/booking");
       } else {
