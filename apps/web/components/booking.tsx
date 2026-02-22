@@ -77,108 +77,130 @@ export default function BookingForm() {
   };
 
   return (
-    <div className="max-w-md mx-auto p-6 bg-white rounded-lg shadow-md">
-      <h2 className="text-2xl font-bold mb-6">Book Your Ticket</h2>
+    <div className="max-w-md mx-auto p-6 bg-gray-900/50  backdrop-blur-sm border border-white/10 rounded-xl shadow-2xl relative z-10">
+      <h2 className="text-2xl font-bold mb-6 text-white">Book Your Ticket</h2>
 
       <form onSubmit={handleCheckout} className="space-y-4">
         {/* Class Type Selection */}
         <div>
-          <label className="block text-sm font-medium mb-2">Select Class</label>
+          <label className="block text-xs font-medium mb-2 text-white/50 uppercase tracking-widest">
+            Selected Class
+          </label>
           <div className="space-y-2">
-            <label className="flex items-center p-3 border rounded cursor-pointer hover:bg-gray-50">
+            <label
+              className={`flex items-center p-3 border rounded-lg cursor-pointer transition-all ${
+                classTypeParams === "business"
+                  ? "border-blue-400/50 bg-blue-400/10 text-white"
+                  : "border-white/10 bg-transparent text-white/50 hover:bg-white/5 hover:border-white/20"
+              }`}
+            >
               <input
                 type="radio"
                 name="class"
-                value="first-class"
-                checked={classType === "first-class"}
-                onChange={(e) => setClassType(e.target.value as "first-class")}
-                className="mr-3"
+                value="business"
+                checked={classTypeParams === "business"}
+                // onChange={() => setClassType("business")}
+                className="sr-only"
               />
               <div className="flex-1">
-                <div className="font-medium">First Class {seatIdParams}</div>
-                <div className="text-sm text-gray-600">
+                <div
+                  className={`font-medium ${classTypeParams === "business" ? "text-white" : "text-white/50"}`}
+                >
+                  Business Class
+                </div>
+                <div
+                  className={`text-sm ${classTypeParams === "business" ? "text-blue-300/70" : "text-white/30"}`}
+                >
                   ${prices["first-class"]} per ticket
                 </div>
               </div>
+              <div
+                className={`w-2 h-2 rounded-full transition-all ${classTypeParams === "business" ? "bg-blue-400" : "bg-white/20"}`}
+              />
             </label>
 
-            <label className="flex items-center p-3 border rounded cursor-pointer hover:bg-gray-50">
+            <label
+              className={`flex items-center p-3 border rounded-lg cursor-pointer transition-all ${
+                classTypeParams === "economy"
+                  ? "border-blue-400/50 bg-blue-400/10 text-white"
+                  : "border-white/10 bg-transparent text-white/50 hover:bg-white/5 hover:border-white/20"
+              }`}
+            >
               <input
                 type="radio"
                 name="class"
-                value="second-class"
-                checked={classType === "second-class"}
-                onChange={(e) => setClassType(e.target.value as "second-class")}
-                className="mr-3"
+                value="economy"
+                checked={classTypeParams === "economy"}
+                // onChange={() => setClassType("economy")}
+                className="sr-only"
               />
               <div className="flex-1">
-                <div className="font-medium">Second Class</div>
-                <div className="text-sm text-gray-600">
+                <div
+                  className={`font-medium ${classTypeParams === "economy" ? "text-white" : "text-white/50"}`}
+                >
+                  Economy Class
+                </div>
+                <div
+                  className={`text-sm ${classTypeParams === "economy" ? "text-blue-300/70" : "text-white/30"}`}
+                >
                   ${prices["second-class"]} per ticket
                 </div>
               </div>
+              <div
+                className={`w-2 h-2 rounded-full transition-all ${classTypeParams === "economy" ? "bg-blue-400" : "bg-white/20"}`}
+              />
             </label>
           </div>
         </div>
 
-        {/* Quantity */}
-        <div>
-          <label className="block text-sm font-medium mb-2">
-            Number of Tickets
-          </label>
-          <input
-            type="number"
-            min="1"
-            max="10"
-            value={quantity}
-            onChange={(e) => setQuantity(parseInt(e.target.value))}
-            className="w-full p-2 border rounded"
-            required
-          />
-        </div>
-
         {/* Date */}
         <div>
-          <label className="block text-sm font-medium mb-2">Travel Date</label>
+          <label className="block text-xs font-medium mb-2 text-white/50 uppercase tracking-widest">
+            Travel Date
+          </label>
           <input
             type="date"
             value={date}
             onChange={(e) => setDate(e.target.value)}
-            className="w-full p-2 border rounded"
+            className="w-full p-2 bg-white/5 border border-white/10 rounded-lg text-white/80 focus:outline-none focus:border-blue-400/50 transition-all [color-scheme:dark]"
             required
           />
         </div>
 
         {/* Time */}
         <div>
-          <label className="block text-sm font-medium mb-2">Travel Time</label>
+          <label className="block text-xs font-medium mb-2 text-white/50 uppercase tracking-widest">
+            Travel Time
+          </label>
           <input
             type="time"
             value={time}
             onChange={(e) => setTime(e.target.value)}
-            className="w-full p-2 border rounded"
+            className="w-full p-2 bg-white/5 border border-white/10 rounded-lg text-white/80 focus:outline-none focus:border-blue-400/50 transition-all [color-scheme:dark]"
             required
           />
         </div>
 
         {/* Total Price */}
-        <div className="bg-gray-50 p-4 rounded">
-          <div className="flex justify-between text-lg font-bold">
-            <span>Total:</span>
+        <div className="bg-white/5 border border-white/10 p-4 rounded-lg">
+          <div className="flex justify-between text-lg font-bold text-white/90">
+            <span>Total</span>
             <span>${totalPrice}</span>
           </div>
         </div>
 
         {/* Error Message */}
         {error && (
-          <div className="p-3 bg-red-50 text-red-700 rounded">{error}</div>
+          <div className="p-3 bg-red-500/10 border border-red-500/20 text-red-400 rounded-lg text-sm">
+            {error}
+          </div>
         )}
 
         {/* Submit Button */}
         <button
           type="submit"
           disabled={loading}
-          className="w-full bg-blue-600 text-white py-3 rounded font-medium hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
+          className="w-full bg-blue-500/80 hover:bg-blue-500 text-white py-3 rounded-lg font-medium transition-all disabled:bg-white/10 disabled:text-white/30 disabled:cursor-not-allowed"
         >
           {loading ? "Processing..." : `Pay $${totalPrice}`}
         </button>
