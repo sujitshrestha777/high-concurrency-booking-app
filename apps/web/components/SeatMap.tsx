@@ -18,7 +18,7 @@ export function SeatMap({ rows, selectedSeatIds, onSeatToggle }: SeatMapProps) {
   }>({ "24D": "locked", "25D": "locked", "26D": "booked" });
   const [lockedSeats, setlockedSeats] = useState<lockedSeatsType[]>([
     { seatId: "24D", TTL: Date.now() + 10 * 1000 },
-    { seatId: "25D", TTL: 123 },
+    { seatId: "25D", TTL: Date.now() + 10 * 1000 },
   ]);
   let economyHeaderDisplayed = true;
 

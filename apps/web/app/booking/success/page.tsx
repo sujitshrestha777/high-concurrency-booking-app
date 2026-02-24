@@ -9,6 +9,25 @@ export default function SuccessPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let userId = "cma6td4xb0003usns9hg3ral2"; // Temporary placeholder for userId
+    const ws = new WebSocket("ws://localhost:8080");
+    ws.onopen = () => {
+      console.log("the ws connected to payment initiade ws");
+      ws.send(
+        JSON.stringify({
+          type: "payment_initiated",
+          userId,
+        }),
+      );
+    };
+    ws.onmessage = (event) => {
+      const data = JSON.parse(event.data.toString());
+      // if (data.type === 'BOOKING_SUCCESS') console.log("booking successs");
+      if (data.type === "bookingFailed") console.log("booking payment failed");
+    };
+  });
+
+  useEffect(() => {
     if (sessionId) {
       // Optional: Verify the session on your backend
       setLoading(false);

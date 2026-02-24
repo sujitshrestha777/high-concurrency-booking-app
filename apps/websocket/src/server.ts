@@ -8,6 +8,7 @@ const REDIS_URL = process.env.REDIS_URL || 'redis://localhost:6379';
 const redisClient = new Redis(REDIS_URL);
 
 const clients = new Set<WebSocket>();
+const paymentUsers=new Map<string, WebSocket>();
 
 wss.on('connection', async(ws) => {
   clients.add(ws);
@@ -17,6 +18,31 @@ wss.on('connection', async(ws) => {
     type: 'connected',
     message: 'WebSocket connected successfully'
   }));
+
+  ws.on('message', async (message) => {
+    try {
+      const data = JSON.parse(message.toString());  
+      console.log("message from client in websocket server:",data);
+      if(data.type==="payment_initiated"){
+        const {userId}=data;
+        paymentUsers.set(userId,ws);
+        console.log(`Payment initiated by user ${userId}, WebSocket stored for real-time updates.`);
+
+        const poll = setInterval(async () => {
+
+        const status = await redisClient.get(`payment-status:${userId}`);
+        
+        if (status) {
+          ws.send(JSON.stringify(JSON.parse(status))); 
+          await redisClient.del(`payment-status:${userId}`);  
+          clearInterval(poll); 
+        }
+      }, 2000);
+            }
+    } catch (error) {
+      console.error('Error processing message from client:', error);
+    } 
+  });
 
   const lockkeys= await redisClient.keys('lock:seat:*')
   let initialSeatLocks=[{seatId:'24E', TTL:Date.now()+60*1000},{seatId:'25E', TTL:180}];  
@@ -84,6 +110,21 @@ redisPubSub.on('message', (channel, message) => {
       console.log('Broadcast seat update:', seatUpdate.seatId);
     } catch (error) {
       console.error('Error processing Redis message:', error);
+    }
+  }
+  if(channel === 'SeatpaymentFailed'){
+    try {
+      const paymentFailedData = JSON.parse(message);
+      console.log("message from pub in websocket server for payment failed:",paymentFailedData);
+      const customerTosend=paymentUsers.get(paymentFailedData.userId);
+      if(customerTosend && customerTosend.readyState===WebSocket.OPEN){
+        customerTosend.send(JSON.stringify({
+        type:"bookingFailed",
+        paymentFailedData
+      }))
+      }
+    }catch(error){
+   console.error('Error processing Redis message:', error);
     }
   }
 });
