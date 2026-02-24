@@ -1,6 +1,7 @@
 
-import { auth } from "lib/auth/auth";
+// import { auth } from "lib/auth/auth";
 import { prisma } from "lib/db";
+import { getApiLimiter } from "lib/ratelimit";
 import { NextResponse } from "next/server";
 
 
@@ -13,6 +14,16 @@ export async function GET(req: Request) {
         //             { status: 401 }
         //                 );
         // }
+        const ip=req.headers.get('x-forwarded-for')||"unknown"
+            const limiter=getApiLimiter()
+            try{
+                await limiter.consume(ip)
+            }catch{
+                return NextResponse.json(
+                    { error:"too many request wait 10 sec"},
+                    {status:422}
+                )
+            }
             const seat_booked_updates = await prisma.seat.findMany({
                 where:{
                     status:"BOOKED"

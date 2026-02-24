@@ -19,7 +19,7 @@ wss.on('connection', async(ws) => {
   }));
 
   const lockkeys= await redisClient.keys('lock:seat:*')
-  let initialSeatLocks=[{seatId:'24E', TTL:100},{seatId:'25E', TTL:180}];  
+  let initialSeatLocks=[{seatId:'24E', TTL:Date.now()+60*1000},{seatId:'25E', TTL:180}];  
   for (const keys of lockkeys){
     const seatId= keys.replace('lock:seat:','');
     const lockedUserId=await redisClient.get(keys);

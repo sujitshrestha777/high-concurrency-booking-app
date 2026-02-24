@@ -39,7 +39,7 @@ export async function POST(req:NextRequest) {
                 seatId
             },
             {
-                jobId:`booking-${seatId}-${userId}-${Date.now()}`
+                jobId:`booking-${seatId}-${sessionuserId}-${Date.now()}`
             }
         )
 
