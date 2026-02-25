@@ -19,35 +19,53 @@ wss.on('connection', async(ws) => {
     message: 'WebSocket connected successfully'
   }));
 
-  ws.on('message', async (message) => {
-    try {
-      const data = JSON.parse(message.toString());  
-      console.log("message from client in websocket server:",data);
-      if(data.type==="payment_initiated"){
-        const {userId}=data;
-        paymentUsers.set(userId,ws);
-        console.log(`Payment initiated by user ${userId}, WebSocket stored for real-time updates.`);
+ ws.on("message", async (message) => {
+  try {
+    const data = JSON.parse(message.toString());
+    console.log("Message from client:", data);
 
-        const poll = setInterval(async () => {
+    if (data.type === "payment_initiated") {
+      const { userId } = data;
+      paymentUsers.set(userId, ws);
+      console.log(`Payment initiated by user ${userId}, WebSocket stored.`);
 
-        const statusdata = await redisClient.get(`payment-status:${userId}`);
-        console.log(`Polled payment status for user ${userId}:`, statusdata);
-        if (statusdata) {
-          const status = JSON.parse(statusdata);
-          ws.send(JSON.stringify({
-            type: status.type,
-            message: status.message
-        }));
-          console.log(`Sent payment status update to user ${userId}:`, status); 
-          await redisClient.del(`payment-status:${userId}`);  
-          clearInterval(poll); 
+      let attempts = 0;
+      const maxAttempts = 3;
+
+      const poll = setInterval(async () => {
+        attempts++;
+
+        try {
+          const statusdata = await redisClient.get(`payment-status:${userId}`);
+          console.log(`Polled payment status for user ${userId}:`, statusdata);
+
+          if (statusdata) {
+            const status = JSON.parse(statusdata);
+            ws.send(JSON.stringify({
+              type: status.type,
+              message: status.message,
+            }));
+            console.log(`Sent status update to user ${userId}:`, status);
+
+            await redisClient.del(`payment-status:${userId}`);
+            clearInterval(poll);
+          } else if (attempts >= maxAttempts) {
+            console.log(`No status found for user ${userId} after ${maxAttempts} attempts.`);
+            clearInterval(poll);
+          }
+        } catch (err) {
+          console.error("Error polling Redis:", err);
+          clearInterval(poll);
         }
       }, 2000);
-            }
-    } catch (error) {
-      console.error('Error processing message from client:', error);
-    } 
-  });
+
+      ws.on("close", () => clearInterval(poll));
+    }
+  } catch (error) {
+    console.error("Error processing message:", error);
+  }
+});
+
 
   const lockkeys= await redisClient.keys('lock:seat:*')
   let initialSeatLocks=[{seatId:'24E', TTL:Date.now()+60*1000},{seatId:'25E', TTL:180}];  
