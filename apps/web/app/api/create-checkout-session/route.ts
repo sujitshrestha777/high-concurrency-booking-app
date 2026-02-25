@@ -12,7 +12,7 @@ const prices = {
       'second-class': 10000,   // $100 in cents
     };
 
-const firstClassPattern = /^(?:[1-9]|1[0-3])[ABEF]$/;
+const firstClassPattern = /^(?:[1-9]|1[0-3])[ABDE]$/;
 const secondClassPattern = /^(?:1[4-9]|[2-8][0-9])[A-F]$/;
 
 function checkseatClass(seatId: string): 'first-class' | 'second-class' | null {
@@ -40,6 +40,7 @@ export async function POST(req: Request) {
       redirect('/auth/sign-in');
     }
   const userId = authSession.user.id;
+  console.log(`Initiating checkout session for user ${userId} and session`,authSession);
     // Create checkout session
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
@@ -65,7 +66,7 @@ export async function POST(req: Request) {
         date: bookingDetails.date,
         seatId: bookingDetails.seatId,
         time: bookingDetails.time,
-        userId: userId || 'guest',
+        userId: userId ,
       },
       payment_intent_data: {  
        metadata: {

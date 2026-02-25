@@ -77,6 +77,11 @@ export async function POST(req: Request) {
           seatId,
           status: "SUCCESS",
         }); 
+        await getRedis().set(`payment-status:${userId}`, JSON.stringify({
+          type: "bookingConfirmed",
+          message: "Payment successful and booking confirmed"
+        }), 'EX', 60);
+        
     } catch (error) {
       console.error("Error adding payment job to queue:", error);
       await paymentQueue.add("test-payment", {

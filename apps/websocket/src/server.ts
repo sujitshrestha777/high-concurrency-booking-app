@@ -30,10 +30,15 @@ wss.on('connection', async(ws) => {
 
         const poll = setInterval(async () => {
 
-        const status = await redisClient.get(`payment-status:${userId}`);
-        
-        if (status) {
-          ws.send(JSON.stringify(JSON.parse(status))); 
+        const statusdata = await redisClient.get(`payment-status:${userId}`);
+        console.log(`Polled payment status for user ${userId}:`, statusdata);
+        if (statusdata) {
+          const status = JSON.parse(statusdata);
+          ws.send(JSON.stringify({
+            type: status.type,
+            message: status.message
+        }));
+          console.log(`Sent payment status update to user ${userId}:`, status); 
           await redisClient.del(`payment-status:${userId}`);  
           clearInterval(poll); 
         }
@@ -112,21 +117,7 @@ redisPubSub.on('message', (channel, message) => {
       console.error('Error processing Redis message:', error);
     }
   }
-  if(channel === 'SeatpaymentFailed'){
-    try {
-      const paymentFailedData = JSON.parse(message);
-      console.log("message from pub in websocket server for payment failed:",paymentFailedData);
-      const customerTosend=paymentUsers.get(paymentFailedData.userId);
-      if(customerTosend && customerTosend.readyState===WebSocket.OPEN){
-        customerTosend.send(JSON.stringify({
-        type:"bookingFailed",
-        paymentFailedData
-      }))
-      }
-    }catch(error){
-   console.error('Error processing Redis message:', error);
-    }
-  }
+
 });
 
 // Redis connection events
