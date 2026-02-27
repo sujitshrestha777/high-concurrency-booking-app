@@ -40,6 +40,7 @@ export function Navbar() {
     const fetchUser = async () => {
       try {
         const details = await getUserDetails();
+        console.log("getdetails:", details);
         if (details?.user) {
           setUser(details.user);
         }

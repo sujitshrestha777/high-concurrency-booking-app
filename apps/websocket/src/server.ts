@@ -95,6 +95,12 @@ wss.on('connection', async(ws) => {
 
   ws.on('close', () => {
     clients.delete(ws);
+    for (const [userId, socket] of paymentUsers) {
+          if (socket === ws) {
+            paymentUsers.delete(userId);
+            break;
+    }
+  }
     console.log('Client disconnected. Total:', clients.size);
   });
 

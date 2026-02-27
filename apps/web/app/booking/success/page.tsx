@@ -1,5 +1,6 @@
 "use client";
 
+import { useSession } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -11,9 +12,14 @@ export default function SuccessPage() {
     "connecting" | "confirmed" | "failed"
   >("connecting");
   const [wsMessage, setWsMessage] = useState<string>("");
+  const { data } = useSession();
+  console.log("session data", data);
 
   useEffect(() => {
-    const userId = "cma6tcifm0000usnsiqmzdhxi";
+    if (!data) return;
+    console.log("session data", data);
+
+    const userId = data.user.id;
     const ws = new WebSocket("ws://localhost:8080");
     ws.onopen = () => {
       ws.send(JSON.stringify({ type: "payment_initiated", userId }));
@@ -31,7 +37,7 @@ export default function SuccessPage() {
     };
     ws.onerror = () => setWsStatus("confirmed");
     return () => ws.close();
-  }, []);
+  }, [data]);
 
   useEffect(() => {
     if (sessionId) setLoading(false);
