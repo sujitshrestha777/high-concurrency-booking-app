@@ -27,9 +27,7 @@ export function LockedCard({ seat, onRelease }) {
             </div>
             <div className="flex items-center gap-1.5 mt-0.5">
               <PlaneIcon className="w-3 h-3 text-zinc-500" />
-              <span className="text-[11px] text-zinc-500 tracking-wider">
-                {seat.flight} · {seat.route}
-              </span>
+              <span className="text-[11px] text-zinc-500 tracking-wider"></span>
             </div>
           </div>
         </div>
@@ -54,7 +52,6 @@ export function LockedCard({ seat, onRelease }) {
           </span>
         </div>
         <div className="flex items-center gap-2">
-          <span className="text-[10px] text-zinc-600">{seat.date}</span>
           <button
             onClick={() => onRelease(seat.id)}
             className="p-1.5 rounded-lg bg-zinc-800 hover:bg-red-950 hover:border-red-800 border border-zinc-700 transition-all duration-200 group/btn"

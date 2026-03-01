@@ -2,7 +2,8 @@
 import { BookedCard } from "components/Bookedcard";
 import { LockedCard } from "components/LockedCard";
 import { StatCard } from "components/StateCard";
-import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 const lockedSeats = [
   {
@@ -29,42 +30,6 @@ const lockedSeats = [
   },
 ];
 
-const bookedSeats = [
-  {
-    id: "BK-881",
-    seatId: "22F",
-    class: "Economy",
-    price: 38.0,
-    flight: "QR 007",
-    route: "DXB → DOH",
-    date: "10 FEB 2026",
-    confirmCode: "QR7X9P",
-    status: "booked",
-  },
-  {
-    id: "BK-442",
-    seatId: "5D",
-    class: "Business",
-    price: 540.0,
-    flight: "SQ 321",
-    route: "SIN → NRT",
-    date: "22 JAN 2026",
-    confirmCode: "SQ4KM2",
-    status: "booked",
-  },
-  {
-    id: "BK-319",
-    seatId: "14B",
-    class: "Economy",
-    price: 29.5,
-    flight: "FR 1234",
-    route: "STN → BCN",
-    date: "15 DEC 2025",
-    confirmCode: "FR9ZL7",
-    status: "booked",
-  },
-];
-
 const SeatIcon = ({ className = "w-5 h-5" }) => (
   <svg viewBox="0 0 24 24" fill="currentColor" className={className}>
     <path
@@ -88,20 +53,76 @@ const CheckIcon = ({ className = "w-4 h-4" }) => (
   </svg>
 );
 
+const Spinner = () => (
+  <div className="flex flex-col items-center justify-center gap-3 py-14">
+    <div className="w-6 h-6 border-2 border-zinc-800 border-t-emerald-400 rounded-full animate-spin" />
+    <span className="text-[10px] text-zinc-600 tracking-widest uppercase">
+      Loading seats…
+    </span>
+  </div>
+);
+
+const CLASS_PRICE = { ECONOMY: 100, BUSINESS: 250 };
+
 export default function MySeats() {
   const [locks, setLocks] = useState(lockedSeats);
+  const [bookedSeats, setBookedSeats] = useState([]);
   const [activeFilter, setActiveFilter] = useState("all");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const router = useRouter();
 
   const totalLocked = locks.length;
   const totalBooked = bookedSeats.length;
-  const totalSpent = bookedSeats.reduce((s, b) => s + b.price, 0);
+  const totalSpent = bookedSeats.reduce(
+    (s, b) => s + (CLASS_PRICE[b.classType] ?? 0),
+    0,
+  );
   const totalHeld = locks.reduce((s, l) => s + l.price, 0);
 
   const releaseHold = (id) =>
     setLocks((prev) => prev.filter((s) => s.id !== id));
 
+  useEffect(() => {
+    const fetchBookedSeats = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+
+        const response = await fetch("/api/booking/mybookedseat", {
+          method: "GET",
+        });
+        if (response.status === 401) {
+          router.push("/auth/sign-in");
+          return;
+        }
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.message ?? `Server error ${response.status}`);
+        }
+
+        if (data.success && Array.isArray(data.bookedSeats)) {
+          setBookedSeats(data.bookedSeats);
+        } else {
+          throw new Error(data.message ?? "Unexpected response from server");
+        }
+      } catch (err) {
+        setError(err?.message ?? "Failed to load booked seats");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchBookedSeats();
+  }, [router]);
+
   return (
     <div className="min-h-screen bg-[#000000] font-mono-custom">
+      {/* Grid background */}
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,#1f1f1f_1px,transparent_1px),linear-gradient(to_bottom,#1f1f1f_1px,transparent_1px)] bg-[size:50px_50px] opacity-30" />
+
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Bebas+Neue&display=swap');
         .font-display { font-family: 'Bebas Neue', sans-serif; }
@@ -154,7 +175,6 @@ export default function MySeats() {
         <div className="flex flex-col lg:flex-row gap-5 items-start">
           {/* ── LEFT SIDEBAR ── */}
           <aside className="w-full lg:w-48 lg:flex-shrink-0 animate-slide-up-2">
-            {/* Mobile: 3-col row  |  Desktop: vertical stack */}
             <div className="grid grid-cols-3 lg:grid-cols-1 gap-3">
               <StatCard
                 label="Held"
@@ -164,15 +184,15 @@ export default function MySeats() {
               />
               <StatCard
                 label="Booked"
-                value={totalBooked}
-                sub={`${totalBooked} confirmed`}
+                value={loading ? "—" : totalBooked}
+                sub={loading ? "loading…" : `${totalBooked} confirmed`}
                 accent="text-emerald-400"
               />
               <StatCard
                 label="Total Spent"
-                value={`$${totalSpent.toFixed(0)}`}
+                value={loading ? "—" : `$${totalSpent.toFixed(0)}`}
                 sub="on seat fees"
-                accent="text-emerald-400"
+                accent=""
               />
             </div>
 
@@ -195,7 +215,7 @@ export default function MySeats() {
 
           {/* ── RIGHT MAIN ── */}
           <main className="flex-1 min-w-0 animate-slide-up-3">
-            {/* Held Seats */}
+            {/* ── Held Seats ── */}
             {(activeFilter === "all" || activeFilter === "locked") &&
               locks.length > 0 && (
                 <div className="mb-6">
@@ -229,7 +249,7 @@ export default function MySeats() {
                 </div>
               )}
 
-            {/* Booked Seats */}
+            {/* ── Booked Seats ── */}
             {(activeFilter === "all" || activeFilter === "booked") && (
               <div className="mb-6">
                 <div className="flex items-center gap-2 mb-3">
@@ -239,11 +259,95 @@ export default function MySeats() {
                   </span>
                   <div className="h-px flex-1 bg-zinc-800" />
                 </div>
-                <div className="flex flex-col gap-3">
-                  {bookedSeats.map((seat) => (
-                    <BookedCard key={seat.id} seat={seat} />
-                  ))}
-                </div>
+
+                {/* Loading */}
+                {loading && <Spinner />}
+
+                {/* Error */}
+                {!loading && error && (
+                  <div className="bg-zinc-900 border border-red-900/60 rounded-2xl p-8 flex flex-col items-center gap-3">
+                    <span className="text-[11px] text-red-400 tracking-widest uppercase">
+                      Failed to load
+                    </span>
+                    <span className="text-[10px] text-zinc-600 text-center max-w-xs">
+                      {error}
+                    </span>
+                    <button
+                      onClick={() => window.location.reload()}
+                      className="mt-1 px-4 py-2 rounded-lg bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 text-[10px] text-zinc-300 tracking-widest uppercase transition-all duration-200"
+                    >
+                      Retry
+                    </button>
+                  </div>
+                )}
+
+                {/* Empty */}
+                {!loading && !error && bookedSeats.length === 0 && (
+                  <div className="bg-zinc-900 border border-zinc-800 border-dashed rounded-2xl p-10 flex flex-col items-center gap-3">
+                    <SeatIcon className="w-8 h-8 text-zinc-700" />
+                    <span className="text-[11px] text-zinc-600 tracking-widest">
+                      NO BOOKED SEATS
+                    </span>
+                  </div>
+                )}
+
+                {/* Cards */}
+                {!loading && !error && bookedSeats.length > 0 && (
+                  <div className="flex flex-col gap-3">
+                    {bookedSeats.map((seat, i) => {
+                      const isBusiness = seat.classType === "BUSINESS";
+                      const price = CLASS_PRICE[seat.classType] ?? 0;
+                      return (
+                        <div
+                          key={seat.seatId ?? i}
+                          className="relative bg-zinc-900 border border-zinc-800 rounded-2xl p-5 hover:border-zinc-600 transition-all duration-300 overflow-hidden"
+                        >
+                          {/* top glow strip */}
+                          <div className="absolute top-0 left-0 right-0 h-px bg-emerald-500 opacity-40" />
+
+                          <div className="flex items-start justify-between">
+                            <div className="flex items-center gap-3">
+                              <div className="p-2 rounded-xl bg-emerald-950 border border-emerald-800">
+                                <SeatIcon className="w-5 h-5 text-emerald-400" />
+                              </div>
+                              <div>
+                                <div className="flex items-center gap-2">
+                                  <span className="font-display text-2xl text-white tracking-widest">
+                                    Seat {seat.seatId}
+                                  </span>
+                                  <span
+                                    className={`text-[9px] font-bold tracking-widest px-2 py-0.5 rounded-full ${
+                                      isBusiness
+                                        ? "bg-amber-400 text-black"
+                                        : "bg-zinc-700 text-zinc-300"
+                                    }`}
+                                  >
+                                    {seat.classType}
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+                            <div className="text-right">
+                              <div className="font-display text-2xl text-white">
+                                ${price}
+                              </div>
+                              <div className="text-[9px] text-zinc-600 tracking-widest">
+                                PAID
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className="flex items-center gap-2 pt-3 mt-3 border-t border-zinc-800">
+                            <CheckIcon className="w-3.5 h-3.5 text-emerald-400" />
+                            <span className="text-[10px] font-bold text-emerald-400 tracking-widest">
+                              CONFIRMED
+                            </span>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
             )}
           </main>
