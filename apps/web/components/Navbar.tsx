@@ -1,7 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { MonitorCog, UserPen, LogOut, UserRoundPlus } from "lucide-react";
+import {
+  MonitorCog,
+  UserPen,
+  LogOut,
+  UserRoundPlus,
+  Router,
+} from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { getUserDetails } from "lib/auth/getUserDetail";
@@ -17,6 +23,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { handleSignOut } from "lib/auth/handleSignOut";
 import { handleGoogleSignIn } from "lib/auth/handleGoogleSignIn";
 import { useLock } from "context/SeatLockcontext";
+import { useRouter } from "next/navigation";
 
 export function Navbar() {
   const [user, setUser] = useState<any>(null);
@@ -24,6 +31,7 @@ export function Navbar() {
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [isLogging, setIslogging] = useState(false);
   const { lock, loading: seatlockloading } = useLock();
+  const router = useRouter();
 
   const onLogin = async () => {
     setIslogging(true);
@@ -81,39 +89,27 @@ export function Navbar() {
 
         <div className="flex items-center gap-4">
           <button
-            // onClick={}
-            style={{
-              position: "relative",
-              background: "none",
-              border: "none",
-              cursor: "pointer",
-              fontSize: 26,
-              padding: 4,
+            onClick={() => {
+              router.push("/booking/myseats");
             }}
+            className="relative p-1 rounded-xl bg-zinc-900 border border-zinc-800 hover:border-zinc-600 transition-all duration-200 group flex flex-col items-center"
             title={lock ? "You have a held seat" : "No active hold"}
           >
-            💺
+            <svg
+              viewBox="0 0 24 24"
+              fill="currentColor"
+              className="w-6 h-6 sm:w-6 sm:h-6"
+            >
+              <path
+                d="M19 13V19H5V13C5 11.9 5.9 11 7 11H17C18.1 11 19 11.9 19 13Z"
+                opacity="0.5"
+              />
+              <path d="M4 19H20V21H4V19Z" />
+              <path d="M7 4C7 2.9 7.9 2 9 2H15C16.1 2 17 2.9 17 4V11H7V4Z" />
+            </svg>
             {lock && (
-              <span
-                style={{
-                  position: "absolute",
-                  top: -4,
-                  right: -4,
-                  background: "#facc15",
-                  color: "#000",
-                  fontSize: 10,
-                  fontWeight: 700,
-                  width: 18,
-                  height: 18,
-                  borderRadius: "50%",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  border: "2px solid #fff",
-                  animation: "pulse 2s infinite",
-                }}
-              >
-                1
+              <span className="text-amber-400 text-[9px] font-bold tracking-widest uppercase leading-none mb-0.5">
+                locked
               </span>
             )}
           </button>
