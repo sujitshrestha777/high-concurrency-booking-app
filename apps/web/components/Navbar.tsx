@@ -16,12 +16,14 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { handleSignOut } from "lib/auth/handleSignOut";
 import { handleGoogleSignIn } from "lib/auth/handleGoogleSignIn";
+import { useLock } from "context/SeatLockcontext";
 
 export function Navbar() {
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [isLogging, setIslogging] = useState(false);
+  const { lock, loading: seatlockloading } = useLock();
 
   const onLogin = async () => {
     setIslogging(true);
@@ -78,6 +80,43 @@ export function Navbar() {
         </div>
 
         <div className="flex items-center gap-4">
+          <button
+            // onClick={}
+            style={{
+              position: "relative",
+              background: "none",
+              border: "none",
+              cursor: "pointer",
+              fontSize: 26,
+              padding: 4,
+            }}
+            title={lock ? "You have a held seat" : "No active hold"}
+          >
+            💺
+            {lock && (
+              <span
+                style={{
+                  position: "absolute",
+                  top: -4,
+                  right: -4,
+                  background: "#facc15",
+                  color: "#000",
+                  fontSize: 10,
+                  fontWeight: 700,
+                  width: 18,
+                  height: 18,
+                  borderRadius: "50%",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  border: "2px solid #fff",
+                  animation: "pulse 2s infinite",
+                }}
+              >
+                1
+              </span>
+            )}
+          </button>
           {loading ? (
             <div className="h-8 w-8 animate-pulse bg-gray-700 rounded-full" />
           ) : user ? (

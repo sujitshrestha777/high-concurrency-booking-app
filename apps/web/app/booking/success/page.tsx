@@ -13,7 +13,6 @@ export default function SuccessPage() {
   >("connecting");
   const [wsMessage, setWsMessage] = useState<string>("");
   const { data } = useSession();
-  console.log("session data", data);
 
   useEffect(() => {
     if (!data) return;

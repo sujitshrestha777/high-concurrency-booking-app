@@ -1,5 +1,6 @@
 "use client";
 
+import { useLock } from "context/SeatLockcontext";
 import { getStripePromise } from "lib/stripe/stripe";
 import { useSearchParams } from "next/navigation";
 import { useState } from "react";
@@ -15,6 +16,7 @@ export default function BookingForm() {
   const [error, setError] = useState("");
   const [seatId, setSeatID] = useState("");
 
+  const { clearLock } = useLock();
   const searchparams = useSearchParams();
   const seatIdParams = searchparams.get("id");
   const classTypeParams = searchparams.get("class");
@@ -68,7 +70,9 @@ export default function BookingForm() {
 
       if (error) {
         setError(error.message || "Payment failed");
+        return;
       }
+      clearLock();
     } catch (err: any) {
       setError(err.message);
     } finally {

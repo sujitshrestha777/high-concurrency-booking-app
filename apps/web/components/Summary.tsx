@@ -1,10 +1,11 @@
-import { redirect, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { SeatData } from "../lib/types/types";
-import { auth } from "lib/auth/auth";
+import { useLock } from "context/SeatLockcontext";
 
 export function Summary({ selectedSeats }: { selectedSeats: SeatData[] }) {
   const total = selectedSeats.reduce((acc, s) => acc + s.price, 0);
   const router = useRouter();
+  const { saveLock } = useLock();
   const handlePaySeat = async () => {
     try {
       const response = await fetch("/api/booking", {
@@ -21,6 +22,15 @@ export function Summary({ selectedSeats }: { selectedSeats: SeatData[] }) {
         return;
       }
       if (data.success) {
+        const seatlockdata = {
+          seatId: selectedSeats[0]!.id,
+          class: selectedSeats[0]!.type,
+          price: selectedSeats[0]!.price,
+          expiresAt: Date.now() + 3 * 60 * 1000,
+        };
+        sessionStorage.setItem("lockData", JSON.stringify(seatlockdata));
+        saveLock(seatlockdata);
+
         router.push(
           `/checkout?id=${selectedSeats[0]?.id}&class=${selectedSeats[0]?.type}`,
         );
