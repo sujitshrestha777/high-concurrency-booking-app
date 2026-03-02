@@ -65,7 +65,7 @@ export function Navbar() {
 
   return (
     <nav className="border-b bg-black text-white backdrop-blur sticky h-16 top-0 z-50">
-      <div className="container flex px-6 md:px-32 py-2 items-center justify-between mx-auto">
+      <div className="container flex px-6 md:px-32 py-1 items-center justify-between mx-auto">
         {/* Left Side: Logo & Links */}
         <div className="flex items-center gap-8">
           <Link href="/" className="flex items-center space-x-2">
@@ -89,40 +89,29 @@ export function Navbar() {
 
         <div className="flex items-center gap-4">
           <button
-            onClick={() => {
-              router.push("/booking/myseats");
-            }}
-            className="relative p-1 rounded-xl bg-zinc-900 border border-zinc-800 hover:border-zinc-600 transition-all duration-200 group flex flex-col items-center"
-            title={lock ? "You have a held seat" : "No active hold"}
+            onClick={() => router.push("/booking/myseats")}
+            className="relative flex flex-col items-center justify-center p-1 rounded-md 
+             bg-gradient-to-b from-zinc-900 to-zinc-800 
+             border border-zinc-700 hover:border-amber-300 
+             hover:shadow-lg transition-all duration-300 group w-13 h-13"
+            title={lock.length > 0 ? "You have a held seat" : "No active hold"}
           >
+            {/* Locked badge */}
             {lock.length > 0 && (
-              <div className="absolute -top-1 -right-1 bg-amber-500 text-zinc-900 rounded-full p-1 shadow-lg border border-zinc-900">
-                <svg
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="3"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="w-2.5 h-2.5"
-                >
-                  <rect
-                    x="3"
-                    y="11"
-                    width="18"
-                    height="11"
-                    rx="2"
-                    ry="2"
-                  ></rect>
-                  <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-                </svg>
+              <div
+                className="absolute -top-1 -right-1 bg-amber-400 text-zinc-900 
+                    rounded-full px-1.5 py-0.5 text-[10px] font-bold 
+                    shadow-md border border-zinc-900 animate-pulse"
+              >
+                {lock.length}
               </div>
             )}
 
+            {/* Icon */}
             <svg
               viewBox="0 0 24 24"
               fill="currentColor"
-              className="w-6 h-6 sm:w-6 sm:h-6"
+              className="w-7 h-7 text-amber-300 group-hover:text-amber-400 transition-colors"
             >
               <path
                 d="M19 13V19H5V13C5 11.9 5.9 11 7 11H17C18.1 11 19 11.9 19 13Z"
@@ -131,13 +120,14 @@ export function Navbar() {
               <path d="M4 19H20V21H4V19Z" />
               <path d="M7 4C7 2.9 7.9 2 9 2H15C16.1 2 17 2.9 17 4V11H7V4Z" />
             </svg>
-
-            {lock.length > 0 && (
-              <span className="text-amber-400 text-[9px] font-bold tracking-widest uppercase leading-none mb-0.5">
-                locked
-              </span>
-            )}
+            <span
+              className="text-[9px] font-semibold tracking-wide uppercase 
+                   text-zinc-400 group-hover:text-amber-300"
+            >
+              {lock.length > 0 ? `${lock.length} Locked` : "No Hold"}
+            </span>
           </button>
+
           {loading ? (
             <div className="h-8 w-8 animate-pulse bg-gray-700 rounded-full" />
           ) : user ? (

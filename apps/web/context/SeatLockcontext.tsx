@@ -1,14 +1,14 @@
 "use client";
 
 import { createContext, useContext, useEffect, useState } from "react";
-type LockDataType = {
+export type LockDataType = {
   seatId: string;
   class: string;
   price: number;
   expiresAt: number;
 };
 type LockContextType = {
-  lock: LockDataType | null;
+  lock: LockDataType[] | [];
   loading: boolean;
   saveLock: (lockData: LockDataType) => void;
   clearLock: () => void;
@@ -16,7 +16,7 @@ type LockContextType = {
 const LockContext = createContext<LockContextType | null>(null);
 
 export function LockProvider({ children }) {
-  const [lock, setLock] = useState<[LockDataType] | []>([]);
+  const [lock, setLock] = useState<LockDataType[] | []>([]);
   const [loading, setLoading] = useState(true);
   type lockSeatType = {
     seatId: string;

@@ -1,7 +1,7 @@
 "use client";
-import { BookedCard } from "components/Bookedcard";
 import { LockedCard } from "components/LockedCard";
 import { StatCard } from "components/StateCard";
+import { LockDataType, useLock } from "context/SeatLockcontext";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -14,7 +14,7 @@ const lockedSeats = [
     flight: "BA 0178",
     route: "JFK → LHR",
     date: "03 MAR 2026",
-    expiresIn: "14:32",
+    expiresIn: "12:32",
     status: "locked",
   },
   {
@@ -65,12 +65,13 @@ const Spinner = () => (
 const CLASS_PRICE = { ECONOMY: 100, BUSINESS: 250 };
 
 export default function MySeats() {
-  const [locks, setLocks] = useState(lockedSeats);
+  const [locks, setLocks] = useState<LockDataType[] | []>([]);
   const [bookedSeats, setBookedSeats] = useState([]);
   const [activeFilter, setActiveFilter] = useState("all");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const router = useRouter();
+  const { lock } = useLock();
 
   const totalLocked = locks.length;
   const totalBooked = bookedSeats.length;
@@ -117,6 +118,16 @@ export default function MySeats() {
 
     fetchBookedSeats();
   }, [router]);
+
+  useEffect(() => {
+    const localStorageLockedseats = localStorage.getItem("lockData");
+    console.log("localstoratelockdedseat", lock);
+
+    setLocks(lock);
+  }, [lock]);
+  useEffect(() => {
+    console.log("locks state in the myseats", locks);
+  }, [locks]);
 
   return (
     <div className="min-h-screen bg-[#000000] font-mono-custom">
@@ -214,7 +225,7 @@ export default function MySeats() {
           </aside>
 
           {/* ── RIGHT MAIN ── */}
-          <main className="flex-1 min-w-0 animate-slide-up-3">
+          <main className="flex-1  animate-slide-up-3">
             {/* ── Held Seats ── */}
             {(activeFilter === "all" || activeFilter === "locked") &&
               locks.length > 0 && (
