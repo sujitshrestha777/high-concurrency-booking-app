@@ -26,9 +26,9 @@ export function Summary({ selectedSeats }: { selectedSeats: SeatData[] }) {
           seatId: selectedSeats[0]!.id,
           class: selectedSeats[0]!.type,
           price: selectedSeats[0]!.price,
-          expiresAt: Date.now() + 3 * 60 * 1000,
+          expiresAt: Date.now() + 3 * 58 * 1000,
         };
-        sessionStorage.setItem("lockData", JSON.stringify(seatlockdata));
+
         saveLock(seatlockdata);
 
         router.push(

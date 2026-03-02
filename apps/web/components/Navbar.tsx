@@ -95,6 +95,30 @@ export function Navbar() {
             className="relative p-1 rounded-xl bg-zinc-900 border border-zinc-800 hover:border-zinc-600 transition-all duration-200 group flex flex-col items-center"
             title={lock ? "You have a held seat" : "No active hold"}
           >
+            {lock.length > 0 && (
+              <div className="absolute -top-1 -right-1 bg-amber-500 text-zinc-900 rounded-full p-1 shadow-lg border border-zinc-900">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="3"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="w-2.5 h-2.5"
+                >
+                  <rect
+                    x="3"
+                    y="11"
+                    width="18"
+                    height="11"
+                    rx="2"
+                    ry="2"
+                  ></rect>
+                  <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                </svg>
+              </div>
+            )}
+
             <svg
               viewBox="0 0 24 24"
               fill="currentColor"
@@ -107,7 +131,8 @@ export function Navbar() {
               <path d="M4 19H20V21H4V19Z" />
               <path d="M7 4C7 2.9 7.9 2 9 2H15C16.1 2 17 2.9 17 4V11H7V4Z" />
             </svg>
-            {lock && (
+
+            {lock.length > 0 && (
               <span className="text-amber-400 text-[9px] font-bold tracking-widest uppercase leading-none mb-0.5">
                 locked
               </span>

@@ -16,32 +16,62 @@ type LockContextType = {
 const LockContext = createContext<LockContextType | null>(null);
 
 export function LockProvider({ children }) {
-  const [lock, setLock] = useState<LockDataType | null>(null);
+  const [lock, setLock] = useState<[LockDataType] | []>([]);
   const [loading, setLoading] = useState(true);
+  type lockSeatType = {
+    seatId: string;
+    class: "business" | "economy";
+    price: number;
+    expiresAt: number;
+  };
 
   useEffect(() => {
     const init = async () => {
-      const stored = sessionStorage.getItem("lockData");
+      const stored = localStorage.getItem("lockData");
+      console.log(
+        "stored data in localsttoreage in the items while init()",
+        stored,
+      );
       if (stored) {
         const parsed = JSON.parse(stored);
-        if (parsed.expiresAt > Date.now()) {
-          setLock(parsed);
-          setLoading(false);
-          return;
-        } else {
-          sessionStorage.removeItem("lockData");
-        }
+        console.log("inside parsed expired", parsed);
+        const validData = parsed.filter(
+          (lockseat: lockSeatType) => lockseat.expiresAt > Date.now(),
+        );
+        localStorage.setItem("lockData", JSON.stringify(validData));
+        console.log("valid data", validData);
+        setLock(validData);
       }
     };
     init();
   }, []);
 
+  useEffect(() => {
+    console.log("The lock state has updated to:", lock);
+  }, [lock]);
+
   const saveLock = (lockData: LockDataType) => {
-    setLock(lockData);
+    const raw = localStorage.getItem("lockData");
+    console.log("existing raw data:", raw);
+    let existingSeats = raw ? JSON.parse(raw) : [];
+
+    if (!Array.isArray(existingSeats)) {
+      existingSeats = [existingSeats];
+    }
+
+    console.log("existing seat locks", existingSeats);
+
+    existingSeats.push(lockData);
+
+    console.log("combined existing seats", existingSeats);
+
+    localStorage.setItem("lockData", JSON.stringify(existingSeats));
+    setLock(existingSeats);
   };
+
   const clearLock = () => {
-    sessionStorage.removeItem("lockData");
-    setLock(null);
+    // localStorage.removeItem("lockData");
+    setLock([]);
   };
 
   return (
