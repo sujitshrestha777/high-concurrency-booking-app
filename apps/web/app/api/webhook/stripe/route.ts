@@ -49,6 +49,7 @@ export async function POST(req: Request) {
             });
             await redis.set(`payment-status:${userId}`, JSON.stringify({
               type: "bookingFailed",
+              seatId,
               message: "Payment failed due to seat lock mismatch"
             }), 'EX', 60);
 
@@ -79,6 +80,7 @@ export async function POST(req: Request) {
         }); 
         await getRedis().set(`payment-status:${userId}`, JSON.stringify({
           type: "bookingConfirmed",
+            seatId,
           message: "Payment successful and booking confirmed"
         }), 'EX', 60);
         

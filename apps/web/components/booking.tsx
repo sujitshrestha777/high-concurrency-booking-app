@@ -16,7 +16,6 @@ export default function BookingForm() {
   const [error, setError] = useState("");
   const [seatId, setSeatID] = useState("");
 
-  const { clearLock } = useLock();
   const searchparams = useSearchParams();
   const seatIdParams = searchparams.get("id");
   const classTypeParams = searchparams.get("class");
@@ -72,7 +71,6 @@ export default function BookingForm() {
         setError(error.message || "Payment failed");
         return;
       }
-      clearLock();
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -105,6 +103,7 @@ export default function BookingForm() {
                 checked={classTypeParams === "business"}
                 // onChange={() => setClassType("business")}
                 className="sr-only"
+                readOnly
               />
               <div className="flex-1">
                 <div
@@ -137,6 +136,7 @@ export default function BookingForm() {
                 checked={classTypeParams === "economy"}
                 // onChange={() => setClassType("economy")}
                 className="sr-only"
+                readOnly
               />
               <div className="flex-1">
                 <div

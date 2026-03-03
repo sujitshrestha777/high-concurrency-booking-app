@@ -1,5 +1,6 @@
 "use client";
 
+import { useLock } from "context/SeatLockcontext";
 import { useSession } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -13,6 +14,7 @@ export default function SuccessPage() {
   >("connecting");
   const [wsMessage, setWsMessage] = useState<string>("");
   const { data } = useSession();
+  const { clearLock } = useLock();
 
   useEffect(() => {
     if (!data) return;
@@ -28,7 +30,10 @@ export default function SuccessPage() {
       const data = JSON.parse(event.data.toString());
       console.log("payment_initiated event messsage", data);
 
-      if (data.type === "bookingConfirmed") setWsStatus("confirmed");
+      if (data.type === "bookingConfirmed") {
+        setWsStatus("confirmed");
+        clearLock(data.seatId);
+      }
       if (data.type === "bookingFailed") {
         setWsStatus("failed");
         setWsMessage(data.message || "Payment failed");

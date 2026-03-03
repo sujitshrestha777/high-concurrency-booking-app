@@ -71,7 +71,7 @@ export default function MySeats() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const router = useRouter();
-  const { lock } = useLock();
+  const { lock, clearLock } = useLock();
 
   const totalLocked = locks.length;
   const totalBooked = bookedSeats.length;
@@ -81,8 +81,10 @@ export default function MySeats() {
   );
   const totalHeld = locks.reduce((s, l) => s + l.price, 0);
 
-  const releaseHold = (id) =>
+  const releaseHold = (id, seatId: string) => {
     setLocks((prev) => prev.filter((s) => s.id !== id));
+    clearLock(seatId);
+  };
 
   useEffect(() => {
     const fetchBookedSeats = async () => {
@@ -121,6 +123,7 @@ export default function MySeats() {
 
   useEffect(() => {
     const localStorageLockedseats = localStorage.getItem("lockData");
+    // console.log("localstoratelockdedseat", localStorageLockedseats);
     console.log("localstoratelockdedseat", lock);
 
     setLocks(lock);

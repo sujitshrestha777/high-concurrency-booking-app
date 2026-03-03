@@ -11,7 +11,7 @@ type LockContextType = {
   lock: LockDataType[] | [];
   loading: boolean;
   saveLock: (lockData: LockDataType) => void;
-  clearLock: () => void;
+  clearLock: (seatID: string) => void;
 };
 const LockContext = createContext<LockContextType | null>(null);
 
@@ -69,9 +69,23 @@ export function LockProvider({ children }) {
     setLock(existingSeats);
   };
 
-  const clearLock = () => {
-    // localStorage.removeItem("lockData");
-    setLock([]);
+  const clearLock = (seatID: string) => {
+    const stored = localStorage.getItem("lockData");
+    const parsedstored = JSON.parse(stored);
+    console.log(
+      "stored data in localsttoreage in the items while init()",
+      stored,
+    );
+    const filteredData = parsedstored?.filter((seat) => seat.seatId !== seatID);
+    if (filteredData) {
+      console.log("inside parsed expired", filteredData);
+      const validData = filteredData.filter(
+        (lockseat: lockSeatType) => lockseat.expiresAt > Date.now(),
+      );
+      localStorage.setItem("lockData", JSON.stringify(validData));
+      console.log("valid data", validData);
+      setLock(validData);
+    }
   };
 
   return (

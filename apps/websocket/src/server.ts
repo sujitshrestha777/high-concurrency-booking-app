@@ -43,9 +43,10 @@ wss.on('connection', async(ws) => {
             const status = JSON.parse(statusdata);
             ws.send(JSON.stringify({
               type: status.type,
+                seatId: status.seatId,
               message: status.message,
             }));
-            console.log(`Sent status update to user ${userId}:`, status);
+            console.log(`Sent status update to user ${userId}: of seat ${status.seatId}`, status);
 
             await redisClient.del(`payment-status:${userId}`);
             clearInterval(poll);
@@ -68,7 +69,7 @@ wss.on('connection', async(ws) => {
 
 
   const lockkeys= await redisClient.keys('lock:seat:*')
-  let initialSeatLocks=[{seatId:'24E', TTL:Date.now()+60*1000},{seatId:'25E', TTL:180}];  
+  let initialSeatLocks=[];  
   for (const keys of lockkeys){
     const seatId= keys.replace('lock:seat:','');
     const lockedUserId=await redisClient.get(keys);

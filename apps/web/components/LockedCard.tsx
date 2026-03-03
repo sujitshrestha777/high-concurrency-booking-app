@@ -1,5 +1,33 @@
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+
 export function LockedCard({ seat, onRelease }) {
-  const urgent = parseInt(seat.expiresIn) < 5;
+  const [timeEx, settimeEx] = useState("");
+  const [urgent, setUrgent] = useState(false);
+  const expiry = seat.expiresAt;
+  useEffect(() => {
+    if (!seat) return;
+    const expiry = seat.expiresAt;
+    const intervalId = setInterval(() => {
+      const remaining = expiry - Date.now();
+      if (remaining <= 0) {
+        console.log("Expired");
+        onRelease(seat.seatId);
+        clearInterval(intervalId);
+      } else {
+        const sec = Math.floor((remaining / 1000) % 60);
+        const min = Math.floor((remaining / 1000 / 60) % 60);
+        const hr = Math.floor(remaining / 1000 / 60 / 60);
+        settimeEx(`${hr}:${min}:${sec}`);
+        if (remaining <= 90000) {
+          setUrgent(true);
+        }
+      }
+    }, 1000);
+    return () => clearInterval(intervalId);
+  }, [seat, onRelease]);
+
+  const router = useRouter();
   return (
     <div className="relative bg-zinc-900 border border-zinc-800 rounded-2xl p-5 hover:border-zinc-600 transition-all duration-300 group overflow-hidden">
       <div
@@ -48,17 +76,16 @@ export function LockedCard({ seat, onRelease }) {
           <span
             className={`text-[10px] font-bold tracking-widest ${urgent ? "text-red-400" : "text-amber-400"}`}
           >
-            EXPIRES IN {seat.expiresIn}
+            EXPIRES IN {timeEx}
           </span>
         </div>
         <div className="flex items-center gap-2">
           <button
-            onClick={() => onRelease(seat.id)}
-            className="p-1.5 rounded-lg bg-zinc-800 hover:bg-red-950 hover:border-red-800 border border-zinc-700 transition-all duration-200 group/btn"
+            onClick={() => {
+              router.push(`/checkout?id=${seat.seatId}&class=${seat.class}`);
+            }}
+            className="px-3 py-1.5 rounded-lg bg-amber-400 hover:bg-amber-300 text-black text-[10px] font-bold tracking-widest uppercase transition-all duration-200"
           >
-            <TrashIcon className="w-3.5 h-3.5 text-zinc-500 group-hover/btn:text-red-400 transition-colors" />
-          </button>
-          <button className="px-3 py-1.5 rounded-lg bg-amber-400 hover:bg-amber-300 text-black text-[10px] font-bold tracking-widest uppercase transition-all duration-200">
             Book Now
           </button>
         </div>
