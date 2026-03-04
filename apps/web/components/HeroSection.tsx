@@ -69,11 +69,26 @@ export function HeroSection() {
                 </Link>
               </Button>
               <Button
-                variant="outline"
+                asChild
                 size="lg"
-                className="text-white border-gray-700 hover:bg-white/5 hover:border-purple-500/50 transition-all"
+                className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white shadow-lg shadow-green-500/50 transition-all hover:shadow-green-500/70"
               >
-                Learn More
+                <Link href="/booking/myseats">
+                  My Bookings
+                  <svg
+                    className="ml-2 w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M5 13l4 4L19 7"
+                    />
+                  </svg>
+                </Link>
               </Button>
             </div>
 

@@ -5,7 +5,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "lib/db";
 
 
-let userId="cma6td4xb0003usns9hg3ral2"; // Temporary placeholder for userId
+// let userId="cma6td4xb0003usns9hg3ral2"; // Temporary placeholder for userId
 
 
 export async function GET(req:NextRequest) {
@@ -34,7 +34,7 @@ export async function GET(req:NextRequest) {
    
         const bookedSeats = await prisma.booking.findMany({
             where: {
-                userId,       
+                userId:sessionuserId,       
             },
             include: {
                 seat: true, // Assuming you have a relation set up to get seat details

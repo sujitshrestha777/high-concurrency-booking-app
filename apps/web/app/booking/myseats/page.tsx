@@ -119,7 +119,7 @@ export default function MySeats() {
     };
 
     fetchBookedSeats();
-  }, [router]);
+  }, []);
 
   useEffect(() => {
     const localStorageLockedseats = localStorage.getItem("lockData");
@@ -243,7 +243,7 @@ export default function MySeats() {
                   <div className="flex flex-col gap-3">
                     {locks.map((seat) => (
                       <LockedCard
-                        key={seat.id}
+                        key={seat.seatId}
                         seat={seat}
                         onRelease={releaseHold}
                       />
