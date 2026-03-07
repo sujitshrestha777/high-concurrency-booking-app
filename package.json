@@ -2,13 +2,14 @@
   "name": "booking-system",
   "private": true,
   "scripts": {
-    "build": "turbo run build",
-    "dev": "turbo run dev",
-    "dev:web": "turbo run dev --filter=web...",
-    "lint": "turbo run lint",
-    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
-    "check-types": "turbo run check-types"
-  },
+  "build": "turbo run build",
+  "generate": "turbo run db:generate",
+  "dev": "turbo run dev",
+  "dev:web": "turbo run dev --filter=web...",
+  "lint": "turbo run lint",
+  "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+  "check-types": "turbo run check-types"
+},
   "devDependencies": {
     "prettier": "^3.5.3",
     "turbo": "^2.5.2",
