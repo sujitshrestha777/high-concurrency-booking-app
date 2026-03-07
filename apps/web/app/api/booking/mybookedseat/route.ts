@@ -44,7 +44,7 @@ export async function GET(req:NextRequest) {
 
          return NextResponse.json({
             success: true,
-            bookedSeats: bookedSeats.map(booking => ({
+            bookedSeats: bookedSeats.map((booking:any) => ({
                 id: booking.id,
                 classType: booking.seat.classType,
                 seatId: booking.seat.seatIdentifier, 
