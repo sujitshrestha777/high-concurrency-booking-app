@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import { PrismaClient } from "@prisma/client"
 import type { Adapter } from "next-auth/adapters"
 import { prisma } from "./prisma"
