@@ -105,6 +105,52 @@ export function Summary({ selectedSeats }: { selectedSeats: SeatData[] }) {
           </button>
         </div>
       </div>
+      <div className="mt-10 bg-white/[0.04] border border-white/10 rounded-2xl p-4">
+        <p className="text-[11px] font-medium uppercase tracking-widest text-white/35 mb-3">
+          Seat Status
+        </p>
+        <div className="grid grid-cols-2 gap-2.5">
+          {[
+            {
+              color: "bg-gray-500",
+              ring: "ring-gray-500/25",
+              label: "Available",
+              desc: "Open to select",
+            },
+            {
+              color: "bg-purple-500",
+              ring: "ring-purple-500/25",
+              label: "Selected",
+              desc: "In your cart",
+            },
+            {
+              color: "bg-red-500",
+              ring: "ring-red-500/25",
+              label: "Booked",
+              desc: "Already taken",
+            },
+            {
+              color: "bg-yellow-500",
+              ring: "ring-yellow-500/25",
+              label: "Locked",
+              desc: "Temporarily held",
+            },
+          ].map(({ color, ring, label, desc }) => (
+            <div
+              key={label}
+              className="flex items-center gap-2.5 bg-white/[0.04] border border-white/[0.07] rounded-xl px-3 py-2"
+            >
+              <div
+                className={`w-3 h-3 rounded-full flex-shrink-0 ${color} ring-[3px] ${ring}`}
+              />
+              <div>
+                <p className="text-xs text-white/65">{label}</p>
+                <p className="text-[10px] text-white/30">{desc}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
   );
 }
