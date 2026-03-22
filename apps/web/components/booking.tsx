@@ -3,9 +3,17 @@
 import { useLock } from "context/SeatLockcontext";
 import { getStripePromise } from "lib/stripe/stripe";
 import { useSearchParams } from "next/navigation";
-import { useState } from "react";
+import { useState, Suspense } from "react";
 
-export default function BookingForm() {
+export default function CheckoutPage() {
+  return (
+    <Suspense fallback={<div className="text-white p-6">Loading...</div>}>
+      <BookingForm />
+    </Suspense>
+  );
+}
+
+function BookingForm() {
   const [classType, setClassType] = useState<"first-class" | "second-class">(
     "first-class",
   );

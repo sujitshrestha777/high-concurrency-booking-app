@@ -1,32 +1,8 @@
-// import { redirect } from "next/navigation";
-// import { auth } from "../../lib/auth/auth";
-
-// const Page = async () => {
-//   const session = await auth();
-
-//   if (!session) {
-//     redirect("/auth/sign-in");
-//   }
-
-//   const role = session.user.role;
-
-//   return (
-//     <div>
-//       <h1>Dashboard</h1>
-//       <p>
-//         Welcome, {session.user.name},{role}
-//       </p>
-//     </div>
-//   );
-// };
-
-// export default Page;
-// app/dashboard/DashboardClient.tsx
 "use client";
 
-import { useSession } from "next-auth/react";
+import { useSession, SessionProvider } from "next-auth/react";
 
-export default function DashboardClient() {
+function DashboardClient() {
   const { data: session, status } = useSession();
 
   if (status === "loading") {
@@ -46,5 +22,13 @@ export default function DashboardClient() {
         Welcome, {session.user.name}, {role}
       </p>
     </div>
+  );
+}
+
+export default function HomePage() {
+  return (
+    <SessionProvider>
+      <DashboardClient />
+    </SessionProvider>
   );
 }
