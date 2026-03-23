@@ -9,16 +9,16 @@ let userId="cma6td4xb0003usns9hg3ral2"; // Temporary placeholder for userId
 
 
 export async function POST(req:NextRequest) {
-    const ip=req.headers.get('x-forwarded-for')||"unknown"
-    const limiter=getbookingLimiter()
-    try{
-        await limiter.consume(ip)
-    }catch{
-        return NextResponse.json(
-            { error:"too many request wait 10 sec"},
-            {status:422}
-        )
-    }
+    // const ip=req.headers.get('x-forwarded-for')||"unknown"
+    // const limiter=getbookingLimiter()
+    // try{
+    //     await limiter.consume(ip)
+    // }catch{
+    //     return NextResponse.json(
+    //         { error:"too many request wait 10 sec"},
+    //         {status:422}
+    //     )
+    // }
     try {
         const session = await auth();
         if (!session) { 
