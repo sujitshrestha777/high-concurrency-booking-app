@@ -197,6 +197,9 @@ importers:
       eslint:
         specifier: ^8.5.3
         version: 8.57.1
+      prisma:
+        specifier: 6.11.0
+        version: 6.11.0(typescript@5.8.2)
       tailwindcss:
         specifier: ^3.4.1
         version: 3.4.1(ts-node@10.9.2(@types/node@22.15.3)(typescript@5.8.2))
@@ -6571,7 +6574,6 @@ snapshots:
       '@prisma/engines': 6.11.0
     optionalDependencies:
       typescript: 5.8.2
-    optional: true
 
   prisma@6.11.0(typescript@5.8.3):
     dependencies:
