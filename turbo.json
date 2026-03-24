@@ -11,7 +11,8 @@
         "AUTH_GOOGLE_ID",
         "AUTH_GOOGLE_SECRET",
         "STRIPE_SECRET_KEY",
-        "STRIPE_WEBHOOK_SECRET"
+        "STRIPE_WEBHOOK_SECRET",
+        "REDIS_URL"
       ],
       "inputs": ["$TURBO_DEFAULT$", ".env*"],
       "outputs": [".next/**", "!.next/cache/**", "dist/**"]
