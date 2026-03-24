@@ -21,7 +21,8 @@ function SuccessContent() {
     console.log("session data", data);
 
     const userId = data.user.id;
-    const ws = new WebSocket("ws://localhost:8080");
+    const socketUrl = process.env.NEXT_PUBLIC_WS_URL || "ws://localhost:8080";
+    const ws = new WebSocket(socketUrl);
     ws.onopen = () => {
       ws.send(JSON.stringify({ type: "payment_initiated", userId }));
       console.log("payment_initiated confirmed");
