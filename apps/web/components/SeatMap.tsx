@@ -82,7 +82,8 @@ export function SeatMap({ rows, selectedSeatIds, onSeatToggle }: SeatMapProps) {
     return () => clearInterval(timerId);
   }, [lockedSeats]);
   useEffect(() => {
-    const ws = new WebSocket("ws://localhost:8080");
+    const socketUrl = process.env.NEXT_PUBLIC_WS_URL || "ws://localhost:8080";
+    const ws = new WebSocket(socketUrl);
 
     ws.onopen = () => {
       console.log("Connected to WebSocket server");
