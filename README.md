@@ -32,16 +32,16 @@ This project ensures **exactly-once booking** using Redis locks, background job 
 ### 🧑‍💻 User Flow
 
 - 🔐 Authentication  
-  ![](./screenshots/auth.png)
+  ![](./screenshot/auth.png)
 
 - 🏠 Home Page  
-  ![](./screenshots/homePage.png)
+  ![](./screenshot/homePage.png)
 
 - 🎫 Seat Selection  
-  ![](./screenshots/MySeats.png)
+  ![](./screenshot/MySeats.png)
 
 - ✅ Confirmation  
-  ![](./screenshots/confirm.png)
+  ![](./screenshot/confirm.png)
 
 ---
 
@@ -49,7 +49,7 @@ This project ensures **exactly-once booking** using Redis locks, background job 
 
 
 - 🧠 Architecture  
-  ![](./screenshots/architecture.png)
+  ![](./screenshot/architecture.png)
 ---
 
 ## 🏗️ System Design & Architecture
@@ -87,11 +87,6 @@ This system follows a **Lock → Verify → Commit** pattern to handle concurren
 
 ---
 
-## 🧠 Architecture Diagram
-
-![Architecture](./screenshots/architecture.png)
-
----
 
 ## 🛠️ Tech Stack
 
@@ -108,10 +103,3 @@ This system follows a **Lock → Verify → Commit** pattern to handle concurren
 
 ---
 
-## 🛠️ Local Setup & Installation
-
-### 1. Clone Repository
-```bash
-git clone https://github.com/your-username/booking-system.git
-cd booking-system
-pnpm install
