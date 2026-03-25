@@ -29,17 +29,27 @@ This project ensures **exactly-once booking** using Redis locks, background job 
 
 ## 🖼️ Screenshots
 
-### 🎫 Seat Selection UI
-![Seat Selection](./screenshots/seat-selection.png)
+### 🧑‍💻 User Flow
 
-### 🔄 Real-Time Updates
-![Realtime Updates](./screenshots/realtime.png)
+- 🔐 Authentication  
+  ![](./screenshots/auth.png)
 
-### 💳 Payment Flow
-![Payment Flow](./screenshots/payment.png)
+- 🏠 Home Page  
+  ![](./screenshots/homePage.png)
 
-> Place your screenshots inside a `/screenshots` folder.
+- 🎫 Seat Selection  
+  ![](./screenshots/MySeats.png)
 
+- ✅ Confirmation  
+  ![](./screenshots/confirm.png)
+
+---
+
+### ⚡ System
+
+
+- 🧠 Architecture  
+  ![](./screenshots/architecture.png)
 ---
 
 ## 🏗️ System Design & Architecture
