@@ -1,84 +1,121 @@
-# Turborepo starter
+✈️ Real-Time Airline Booking Engine
 
-This Turborepo starter is maintained by the Turborepo core team.
+A high-concurrency seat reservation system built using a distributed locking architecture.
+This project ensures exactly-once booking using Redis locks, background job queues, and real-time synchronization.
 
-## Using this example
+🚀 Key Features
+⚡ Real-Time Seat Map
+Interactive UI with instant updates across all users using WebSockets.
+🔒 Distributed Locking (No Double Booking)
+Uses Redis SETNX to ensure only one user can reserve a seat at a time.
+⏳ Automatic Seat Expiration
+Seats are locked for a limited time (e.g., 10 minutes). If payment is not completed, they are automatically released.
+💳 Secure Payment Integration
+Full integration with Stripe using Payment Intents and webhook verification.
+📦 Queue-Based Background Processing
+Uses BullMQ to handle retries, failures, and delayed jobs.
+🌐 Scalable Architecture
+Separate services for frontend, backend, workers, and real-time communication.
+🖼️ Screenshots
+🎫 Seat Selection UI
 
-Run the following command:
+🔄 Real-Time Updates
 
-```sh
-npx create-turbo@latest
-```
+💳 Payment Flow
 
-## What's inside?
+📌 Place your screenshots inside a /screenshots folder in your repo.
 
-This Turborepo includes the following packages/apps:
+🏗️ System Design & Architecture
 
-### Apps and Packages
+This system follows a Lock → Verify → Commit pattern to handle concurrency safely.
 
-- `docs`: a [Next.js](https://nextjs.org/) app
-- `web`: another [Next.js](https://nextjs.org/) app
-- `@repo/ui`: a stub React component library shared by both `web` and `docs` applications
-- `@repo/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
+🔁 Architectural Flow
+Seat Selection
+User selects a seat → sent to backend
+Seat Locking
+Backend:
+Locks seat in Redis (with TTL)
+Adds delayed job to queue (for expiration)
+Real-Time Sync
+WebSocket broadcasts:
+SEAT_LOCKED to all users
+Payment
+User completes payment via Stripe
+Webhook Confirmation
+Stripe sends webhook → backend verifies payment
+Final Booking
+Worker:
+Stores booking in database
+Removes Redis lock
+Broadcast Update
+WebSocket sends:
+SEAT_BOOKED to all clients
+🧠 Architecture Diagram
 
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
+🛠️ Tech Stack
+Layer	Technology
+Frontend	Next.js (App Router), Tailwind CSS
+Backend	Node.js / Next.js API
+Database	PostgreSQL + Prisma ORM
+Cache	Redis
+Queue	BullMQ
+Real-Time	WebSocket (ws)
+Payments	Stripe
+Deployment	Vercel (Frontend), Railway (Backend & Workers)
+🛠️ Local Setup & Installation
+1️⃣ Clone Repository
+git clone https://github.com/your-username/booking-system.git
+cd booking-system
+pnpm install
+2️⃣ Environment Variables
 
-### Utilities
+Create a .env file:
 
-This Turborepo has some additional tools already setup for you:
-
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
-
-### Build
-
-To build all apps and packages, run the following command:
-
-```
-cd my-turborepo
-pnpm build
-```
-
-### Develop
-
-To develop all apps and packages, run the following command:
-
-```
-cd my-turborepo
+DATABASE_URL="postgresql://user:pass@localhost:5432/db"
+REDIS_URL="redis://localhost:6379"
+STRIPE_SECRET_KEY="sk_test_..."
+STRIPE_WEBHOOK_SECRET="whsec_..."
+NEXT_PUBLIC_WS_URL="ws://localhost:8080"
+3️⃣ Database Setup
+cd apps/web
+npx prisma generate
+npx prisma db push
+4️⃣ Start Development
 pnpm dev
-```
+⚠️ Concurrency & Safety Mechanisms
+✅ Redis SETNX ensures only one lock per seat
+✅ TTL prevents deadlocks (auto-release)
+✅ Queue handles delayed expiration
+✅ Database enforces final consistency
+✅ Idempotent webhook handling prevents duplicate bookings
+🔧 Troubleshooting
+🪟 Windows Issues (EPERM / Lock Errors)
+taskkill /f /im node.exe
 
-### Remote Caching
+Then delete .next:
 
-> [!TIP]
-> Vercel Remote Cache is free for all plans. Get started today at [vercel.com](https://vercel.com/signup?/signup?utm_source=remote-cache-sdk&utm_campaign=free_remote_cache).
+Remove-Item -Recurse -Force .next
+🔌 WebSocket Issues
+Ensure:
+Local: ws://localhost:8080
+Production: your deployed WebSocket URL
+📚 Learning & Concepts Covered
 
-Turborepo can use a technique known as [Remote Caching](https://turborepo.com/docs/core-concepts/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
+This project demonstrates:
 
-By default, Turborepo will cache locally. To enable Remote Caching you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup?utm_source=turborepo-examples), then enter the following commands:
+Distributed Systems Design
+Concurrency Control (Double Booking Problem)
+Event-Driven Architecture
+Background Job Processing
+Real-Time Systems
+Payment Integration
+🎯 Why This Project Matters
 
-```
-cd my-turborepo
-npx turbo login
-```
+Most booking systems fail under concurrency.
+This system is designed to handle:
 
-This will authenticate the Turborepo CLI with your [Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
+High traffic
+Race conditions
+Payment reliability
 
-Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your Turborepo:
-
-```
-npx turbo link
-```
-
-## Useful Links
-
-Learn more about the power of Turborepo:
-
-- [Tasks](https://turborepo.com/docs/crafting-your-repository/running-tasks)
-- [Caching](https://turborepo.com/docs/crafting-your-repository/caching)
-- [Remote Caching](https://turborepo.com/docs/core-concepts/remote-caching)
-- [Filtering](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters)
-- [Configuration Options](https://turborepo.com/docs/reference/configuration)
-- [CLI Usage](https://turborepo.com/docs/reference/command-line-reference)
+👉 Making it closer to real-world production systems like airline or ticket platforms.
