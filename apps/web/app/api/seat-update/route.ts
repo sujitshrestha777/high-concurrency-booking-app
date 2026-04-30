@@ -2,6 +2,7 @@
 // import { auth } from "lib/auth/auth";
 import { prisma } from "lib/db";
 import { getApiLimiter } from "lib/ratelimit";
+import { getRedis } from "lib/redis/redis";
 import { NextResponse } from "next/server";
 
 
@@ -14,8 +15,24 @@ export async function GET(req: Request) {
         //             { status: 401 }
         //                 );
         // }
-        const ip=req.headers.get('x-forwarded-for')||"unknown"
-            const limiter=getApiLimiter()
+           const ip=req.headers.get('x-forwarded-for')||"unknown"
+            const limiter=getApiLimiter();
+
+                    try {
+                    const redisClient = getRedis();
+                await limiter.consume(ip);
+            } catch (err) {
+                console.error("RATE LIMIT / REDIS ERROR:", err);
+
+                return NextResponse.json(
+                    {
+                        error: "rate limiter failed or too many requests",
+                        details: String(err),
+                    },
+                    { status: 429 }
+                );
+            }
+     
             try{
                 await limiter.consume(ip)
             }catch{
