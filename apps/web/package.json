@@ -21,6 +21,7 @@
     "@stripe/react-stripe-js": "^3.7.0",
     "@stripe/stripe-js": "^7.4.0",
     "@tailwindcss/postcss": "^4.1.5",
+    "@upstash/redis": "^1.37.0",
     "bullmq": "^5.53.2",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
